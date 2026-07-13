@@ -28,10 +28,10 @@ usort($all_sizes, function($a, $b) use ($size_order) {
 <?php
 // Size label → numeric equivalent mapping
 $size_numbers = [
-    'S'   => '36/38',
-    'M'   => '38/40',
-    'L'   => '40/42',
-    'XL'  => '42/44',
+    'S'   => '36',
+    'M'   => '38',
+    'L'   => '40',
+    'XL'  => '42',
     'XXL' => '44/46',
     '3XL' => '48',
     '4XL' => '50',
