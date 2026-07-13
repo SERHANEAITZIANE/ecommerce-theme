@@ -172,6 +172,11 @@ echo 'var ZR=' . wp_json_encode([
     'wilayas'         => $wilayas,
     'communes'        => $communes_by_wilaya,
     'desks_by_wilaya' => $desks_by_wilaya,
+    'free_shipping'   => [
+        'enabled' => get_option('ayra_free_shipping_enabled') === 'yes',
+        'min'     => (float) get_option('ayra_free_shipping_min', 15000),
+        'active'  => function_exists('ayra_is_free_shipping_active') && ayra_is_free_shipping_active(),
+    ],
     '_debug'          => $debug_info
 ]) . ';';
 ?>
@@ -185,6 +190,30 @@ jQuery(document).ready(function($){
     var ajaxUrl=(typeof ayra_ajax!=='undefined')?ayra_ajax.url:wc_checkout_params.ajax_url;
 
     function pad(n){return String(n).padStart(2,'0');}
+    // Delivery type now comes from radio cards instead of a <select>
+    function dType(){return $('input[name="billing_delivery_type"]:checked').val()||'';}
+    function isFreeShipping(){return !!(ZR.free_shipping&&ZR.free_shipping.enabled&&ZR.free_shipping.active);}
+    // Show each card's price for the selected wilaya (or "مجاني" during the promo)
+    function updateCardPrices(){
+        var code=parseInt($('#billing_wilaya').val())||0;
+        var w=(code&&ZR.wilayas[code])?ZR.wilayas[code]:null;
+        $('.ayra-dlv-price').each(function(){
+            var t=$(this).data('type');
+            if(isFreeShipping()){$(this).text('توصيل مجاني ✓').addClass('free');return;}
+            $(this).removeClass('free');
+            if(!w){$(this).text('');return;}
+            var p=(t==='desk')?w.price_desk:w.price_home;
+            $(this).text(p>0?p+' دج':'');
+        });
+    }
+    // The free-shipping summary row is rendered server-side only when the
+    // threshold is met, so its presence is the source of truth after updates
+    function refreshFreeShipping(){
+        if(ZR.free_shipping&&ZR.free_shipping.enabled){
+            ZR.free_shipping.active=$('.ayra-free-shipping-row').length>0;
+        }
+        updateCardPrices();
+    }
     function msg(t,type){
         var $m=$('<div class="ayra-toast '+type+'">'+t+'</div>');
         $('body').append($m);
@@ -192,19 +221,19 @@ jQuery(document).ready(function($){
         setTimeout(function(){$m.removeClass('show');setTimeout(function(){$m.remove();},300);},3000);
     }
     function steps(){
-        var w=$('#billing_wilaya').val(), d=$('#billing_delivery_type').val();
+        var w=$('#billing_wilaya').val(), d=dType();
         $('.ayra-step').removeClass('active done');
         if(w&&d){$('.ayra-step[data-step="1"],.ayra-step[data-step="2"]').addClass('done');$('.ayra-step[data-step="3"]').addClass('active');}
         else if(w||d){$('.ayra-step[data-step="1"]').addClass('done');$('.ayra-step[data-step="2"]').addClass('active');}
         else{$('.ayra-step[data-step="1"]').addClass('active');}
     }
     function reloadWilayas(){
-        var dType=$('#billing_delivery_type').val();
+        var dt=dType();
         var $sel=$('#billing_wilaya'), prev=$sel.val();
         var codes=Object.keys(ZR.wilayas).map(Number).sort(function(a,b){return a-b;});
         var html='<option value="">اختر/ي الولاية</option>';
         codes.forEach(function(code){
-            if(dType==='desk'&&(!ZR.desks_by_wilaya[code]||!ZR.desks_by_wilaya[code].length))return;
+            if(dt==='desk'&&(!ZR.desks_by_wilaya[code]||!ZR.desks_by_wilaya[code].length))return;
             html+='<option value="'+code+'">'+pad(code)+' - '+ZR.wilayas[code].name+'</option>';
         });
         $sel.html(html);
@@ -225,7 +254,7 @@ jQuery(document).ready(function($){
 
     function reloadCommunes(){
         var code=parseInt($('#billing_wilaya').val())||0;
-        var dType=$('#billing_delivery_type').val();
+        var dt=dType();
         var $sel=$('#billing_commune'), prev=$sel.val();
         $sel.html('<option value="">اختر/ي البلدية</option>');
         // Clear hub hidden fields
@@ -233,7 +262,7 @@ jQuery(document).ready(function($){
         $('#billing_desk_district_id').val('');
         $('#billing_desk_city_id').val('');
         if(!code)return;
-        if(dType==='desk'){
+        if(dt==='desk'){
             // Show ALL individual hubs — no dedup by district
             (ZR.desks_by_wilaya[code]||[]).forEach(function(d,idx){
                 $sel.append('<option value="'+d.district+'__hub__'+idx+'"'
@@ -255,13 +284,19 @@ jQuery(document).ready(function($){
     }
     function updatePrice(){
         var code=parseInt($('#billing_wilaya').val())||0;
-        var dType=$('#billing_delivery_type').val();
-        currentDeliveryPrice=(code&&dType&&ZR.wilayas[code])
-            ?(dType==='desk'?ZR.wilayas[code].price_desk:ZR.wilayas[code].price_home):0;
+        var dt=dType();
+        currentDeliveryPrice=(code&&dt&&ZR.wilayas[code])
+            ?(dt==='desk'?ZR.wilayas[code].price_desk:ZR.wilayas[code].price_home):0;
+        if(isFreeShipping())currentDeliveryPrice=0;
+        updateCardPrices();
         $(document.body).trigger('update_checkout');
     }
 
-    $(document).on('change','#billing_delivery_type',function(){reloadWilayas();updatePrice();steps();});
+    $(document).on('change','input[name="billing_delivery_type"]',function(){
+        $('.ayra-dlv-card').removeClass('active');
+        $(this).closest('.ayra-dlv-card').addClass('active');
+        reloadWilayas();updatePrice();steps();
+    });
     $(document).on('change','#billing_wilaya',function(){reloadCommunes();updatePrice();steps();});
     // When commune changes in desk mode, populate hidden hub fields
     $(document).on('change','#billing_commune',function(){
@@ -270,7 +305,8 @@ jQuery(document).ready(function($){
 
     // WooCommerce may re-trigger events after update_checkout — re-sync hub fields & button total
     $(document.body).on('updated_checkout',function(){
-        if($('#billing_delivery_type').val()==='desk' && $('#billing_commune').val()){
+        refreshFreeShipping();
+        if(dType()==='desk' && $('#billing_commune').val()){
             syncHubFields();
         }
         // Update the purple button total to include delivery fee
@@ -304,7 +340,7 @@ jQuery(document).ready(function($){
     });
     $('#ayra_custom_submit').on('click',function(e){
         e.preventDefault();
-        if(!$('#billing_delivery_type').val()){msg('يرجى اختيار طريقة التوصيل أولاً','error');return;}
+        if(!dType()){msg('يرجى اختيار طريقة التوصيل أولاً','error');return;}
         if(!$('#billing_wilaya').val()){msg('يرجى اختيار الولاية','error');return;}
         if(!$('#billing_commune').val()){msg('يرجى اختيار البلدية','error');return;}
         // Ensure hub fields are synced right before submission
@@ -312,10 +348,11 @@ jQuery(document).ready(function($){
         $('#place_order').trigger('click');
     });
 
-    if($('#billing_delivery_type').val()){
+    if(dType()){
         reloadWilayas();
         if($('#billing_wilaya').val()){reloadCommunes();updatePrice();}
     }
+    refreshFreeShipping();
     steps();
 });
 </script>
@@ -429,6 +466,23 @@ jQuery(document).ready(function($){
 .ayra-delivery-cards {
     display: flex; flex-direction: column; gap: 12px;
 }
+.ayra-dlv-field { margin-bottom: 16px; }
+.ayra-dlv-group-label {
+    display: block; margin-bottom: 8px;
+    font-size: 14px; font-weight: 700; color: #374151;
+}
+.ayra-dlv-group-label .required { color: #ef4444; text-decoration: none; }
+.ayra-dlv-radio {
+    position: absolute; opacity: 0; pointer-events: none; width: 0; height: 0;
+}
+.ayra-dlv-icon svg { stroke: #6366f1; transition: stroke 0.25s; }
+.ayra-dlv-info { display: flex; flex-direction: column; }
+.ayra-dlv-price { display: block; margin-top: 4px; }
+.ayra-dlv-price:empty { display: none; }
+.ayra-dlv-price.free { color: #16a34a; }
+.woocommerce-invalid .ayra-dlv-card { border-color: #ef4444; }
+.ayra-free-shipping-row th { font-weight: 600; color: #16a34a; font-size: 13px; }
+.ayra-free-shipping-row td { font-weight: 800; color: #16a34a; font-size: 14px; }
 .ayra-dlv-card {
     display: flex; align-items: center; gap: 14px;
     padding: 16px; border: 2px solid #e5e7eb;

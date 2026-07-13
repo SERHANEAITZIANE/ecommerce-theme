@@ -23,11 +23,28 @@ if (!$selected_cat && is_product_category()) {
     }
 }
 
-// Get product categories
+// Get TOP-LEVEL product categories (sub-categories show as a second row)
 $categories = get_terms([
     'taxonomy'   => 'product_cat',
     'hide_empty' => true,
+    'parent'     => 0,
 ]);
+
+// Resolve the selected category and its top-level ancestor so the parent
+// pill stays active and its sub-categories row is displayed
+$selected_cat_term = $selected_cat ? get_term_by('slug', $selected_cat, 'product_cat') : false;
+$active_top_id = 0;
+if ($selected_cat_term && !is_wp_error($selected_cat_term)) {
+    $cat_ancestors = get_ancestors($selected_cat_term->term_id, 'product_cat');
+    $active_top_id = empty($cat_ancestors) ? $selected_cat_term->term_id : (int) end($cat_ancestors);
+}
+$sub_categories = $active_top_id ? get_terms([
+    'taxonomy'   => 'product_cat',
+    'hide_empty' => true,
+    'parent'     => $active_top_id,
+]) : [];
+if (is_wp_error($sub_categories)) $sub_categories = [];
+$active_top_term = $active_top_id ? get_term($active_top_id, 'product_cat') : false;
 
 // Build base URL for filter links — must point to the product ARCHIVE, not the homepage
 // Force the correct product archive URL that actually loads archive-product.php
@@ -195,19 +212,55 @@ usort($all_sizes, function($a, $b) use ($size_order) {
                        class="ayra-filter-pill <?php echo !$selected_cat ? 'active' : ''; ?>">
                         <span class="ayra-pill-text">الكل</span>
                     </a>
-                    <?php foreach ($categories as $cat): 
+                    <?php foreach ($categories as $cat):
                         // Use query-param based URL so filtering stays consistent
                         $cat_url = add_query_arg('product_cat', $cat->slug, $shop_page_url);
                         if ($selected_size) $cat_url = add_query_arg('filter_size', $selected_size, $cat_url);
-                        
+
                         // Get the cross-filtered count for this category
                         $filtered_count = isset($cat_counts[$cat->slug]) ? $cat_counts[$cat->slug] : 0;
-                        $is_cat_active = ($selected_cat === $cat->slug);
+                        // Active when the category itself OR one of its children is selected
+                        $is_cat_active = ($active_top_id === (int) $cat->term_id);
                     ?>
-                    <a href="<?php echo esc_url($cat_url); ?>" 
+                    <a href="<?php echo esc_url($cat_url); ?>"
                        class="ayra-filter-pill <?php echo $is_cat_active ? 'active' : ''; ?> <?php echo ($filtered_count <= 0 && !$is_cat_active) ? 'disabled' : ''; ?>">
                         <span class="ayra-pill-text"><?php echo esc_html($cat->name); ?></span>
                         <span class="ayra-pill-count"><?php echo $filtered_count; ?></span>
+                    </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
+            <!-- Sub-category Filter (packs etc.) — shown when the active category has children -->
+            <?php if (!empty($sub_categories) && $active_top_term && !is_wp_error($active_top_term)): ?>
+            <div class="ayra-filter-section" id="ayra-subcat-filter">
+                <div class="ayra-filter-section-label">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"/>
+                    </svg>
+                    <?php echo esc_html($active_top_term->name); ?>
+                </div>
+                <div class="ayra-cat-filter-pills">
+                    <?php
+                    // "All" pill = the parent category itself
+                    $parent_all_url = add_query_arg('product_cat', $active_top_term->slug, $shop_page_url);
+                    if ($selected_size) $parent_all_url = add_query_arg('filter_size', $selected_size, $parent_all_url);
+                    ?>
+                    <a href="<?php echo esc_url($parent_all_url); ?>"
+                       class="ayra-filter-pill <?php echo ($selected_cat === $active_top_term->slug) ? 'active' : ''; ?>">
+                        <span class="ayra-pill-text">الكل</span>
+                    </a>
+                    <?php foreach ($sub_categories as $sub):
+                        $sub_url = add_query_arg('product_cat', $sub->slug, $shop_page_url);
+                        if ($selected_size) $sub_url = add_query_arg('filter_size', $selected_size, $sub_url);
+                        $sub_count = isset($cat_counts[$sub->slug]) ? $cat_counts[$sub->slug] : 0;
+                        $is_sub_active = ($selected_cat === $sub->slug);
+                    ?>
+                    <a href="<?php echo esc_url($sub_url); ?>"
+                       class="ayra-filter-pill <?php echo $is_sub_active ? 'active' : ''; ?> <?php echo ($sub_count <= 0 && !$is_sub_active) ? 'disabled' : ''; ?>">
+                        <span class="ayra-pill-text"><?php echo esc_html($sub->name); ?></span>
+                        <span class="ayra-pill-count"><?php echo $sub_count; ?></span>
                     </a>
                     <?php endforeach; ?>
                 </div>
@@ -219,12 +272,14 @@ usort($all_sizes, function($a, $b) use ($size_order) {
         </div>
 
         <!-- Active Filter Banner -->
-        <?php if ($selected_size || $selected_cat): 
-            // Get category name for display
+        <?php if ($selected_size || $selected_cat):
+            // Get category name for display (with parent path for sub-categories)
             $cat_name = '';
-            if ($selected_cat) {
-                $cat_term = get_term_by('slug', $selected_cat, 'product_cat');
-                if ($cat_term && !is_wp_error($cat_term)) $cat_name = $cat_term->name;
+            if ($selected_cat_term && !is_wp_error($selected_cat_term)) {
+                $cat_name = $selected_cat_term->name;
+                if ($active_top_term && !is_wp_error($active_top_term) && $active_top_id !== (int) $selected_cat_term->term_id) {
+                    $cat_name = $active_top_term->name . ' ← ' . $cat_name;
+                }
             }
         ?>
         <div class="ayra-active-filter-banner">

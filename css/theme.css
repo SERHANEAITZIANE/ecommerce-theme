@@ -3083,3 +3083,98 @@ body.search-open {
 }
 
 /* mini-cart remove — styles defined above, no duplicate needed */
+/* ═══════════════════════════════════════════
+   Front Page — Shop by Category / Packs
+   ═══════════════════════════════════════════ */
+.ayra-hero-cats {
+    margin-top: 28px;
+    text-align: center;
+}
+
+.ayra-hero-cats-title {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0 0 12px;
+}
+
+.ayra-hero-cats-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.ayra-hero-cat {
+    text-align: center;
+}
+
+/* Expanded category takes the full row so its sub-categories flow below */
+.ayra-hero-cat.open {
+    flex-basis: 100%;
+}
+
+.ayra-hero-cat-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.ayra-hero-cat-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.7);
+}
+
+.ayra-hero-cat.open > .ayra-hero-cat-btn {
+    background: #fff;
+    color: #1f2937;
+}
+
+.ayra-hero-cat-chevron {
+    transition: transform 0.25s;
+}
+
+.ayra-hero-cat.open .ayra-hero-cat-chevron {
+    transform: rotate(180deg);
+}
+
+.ayra-hero-subcats {
+    display: none;
+}
+
+.ayra-hero-cat.open .ayra-hero-subcats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.ayra-hero-subcat {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: #fff;
+    color: #1f2937;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
+}
+
+.ayra-hero-subcat:hover {
+    background: #C9A87C;
+    color: #fff;
+}

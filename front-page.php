@@ -103,6 +103,50 @@ $size_numbers = [
                 </div>
             </div>
 
+            <!-- Shop by category / packs -->
+            <?php
+            $top_cats = get_terms([
+                'taxonomy'   => 'product_cat',
+                'hide_empty' => true,
+                'parent'     => 0,
+            ]);
+            if (!empty($top_cats) && !is_wp_error($top_cats)):
+            ?>
+            <div class="ayra-hero-cats" id="ayra-hero-cats">
+                <p class="ayra-hero-cats-title">أو تسوقي حسب الفئة</p>
+                <div class="ayra-hero-cats-grid">
+                    <?php foreach ($top_cats as $cat):
+                        $children = get_terms([
+                            'taxonomy'   => 'product_cat',
+                            'hide_empty' => true,
+                            'parent'     => $cat->term_id,
+                        ]);
+                        $has_children = !empty($children) && !is_wp_error($children);
+                        $cat_url = add_query_arg('product_cat', $cat->slug, $archive_url);
+                    ?>
+                    <div class="ayra-hero-cat <?php echo $has_children ? 'has-children' : ''; ?>">
+                        <?php if ($has_children): ?>
+                        <button type="button" class="ayra-hero-cat-btn" data-cat="<?php echo esc_attr($cat->slug); ?>">
+                            <?php echo esc_html($cat->name); ?>
+                            <svg class="ayra-hero-cat-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="ayra-hero-subcats">
+                            <a href="<?php echo esc_url($cat_url); ?>" class="ayra-hero-subcat">كل <?php echo esc_html($cat->name); ?></a>
+                            <?php foreach ($children as $child): ?>
+                            <a href="<?php echo esc_url(add_query_arg('product_cat', $child->slug, $archive_url)); ?>" class="ayra-hero-subcat">
+                                <?php echo esc_html($child->name); ?>
+                            </a>
+                            <?php endforeach; ?>
+                        </div>
+                        <?php else: ?>
+                        <a href="<?php echo esc_url($cat_url); ?>" class="ayra-hero-cat-btn"><?php echo esc_html($cat->name); ?></a>
+                        <?php endif; ?>
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+            <?php endif; ?>
+
             <!-- WhatsApp Exchange & Inquiry Action Buttons -->
             <div class="ayra-hero-whatsapp-actions">
                 <a href="https://wa.me/213563537757?text=<?php echo urlencode('السلام عليكم، أريد طلب استبدال منتج'); ?>" target="_blank" class="ayra-hero-wa-btn exchange-btn">

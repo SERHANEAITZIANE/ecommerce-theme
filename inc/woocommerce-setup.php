@@ -42,17 +42,17 @@ function ayra_override_checkout_fields($fields) {
         'priority'    => 20,
     ];
     
-    // Delivery type dropdown
+    // Delivery type radio cards (rendered by ayra_render_delivery_type_cards)
     $fields['billing']['billing_delivery_type'] = [
-        'type'        => 'select',
+        'type'        => 'radio',
         'label'       => 'طريقة التوصيل',
         'required'    => true,
         'class'       => ['form-row-wide', 'ayra-field'],
         'options'     => [
-            ''     => 'اختر/ي طريقة التوصيل',
             'home' => 'توصيل إلى المنزل',
             'desk' => 'توصيل إلى المكتب (StopDesk)'
         ],
+        'default'     => 'home',
         'priority'    => 30,
     ];
     
@@ -79,6 +79,44 @@ function ayra_override_checkout_fields($fields) {
     return $fields;
 }
 add_filter('woocommerce_checkout_fields', 'ayra_override_checkout_fields');
+
+// ─── Render delivery type as tappable radio cards ───────
+// Same field name (billing_delivery_type) and values (home/desk),
+// so order meta, ZR Express parcels and Sheets sync are untouched.
+function ayra_render_delivery_type_cards($field, $key, $args, $value) {
+    if ($key !== 'billing_delivery_type') return $field;
+    if (empty($value)) $value = 'home';
+
+    $icons = [
+        'home' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+        'desk' => '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><path d="M9 21v-4h6v4"/><line x1="9" y1="10" x2="9.01" y2="10"/><line x1="15" y1="10" x2="15.01" y2="10"/><line x1="9" y1="14" x2="9.01" y2="14"/><line x1="15" y1="14" x2="15.01" y2="14"/></svg>',
+    ];
+    $times = [
+        'home' => 'التوصيل حتى باب المنزل',
+        'desk' => 'استلام من مكتب ZR Express',
+    ];
+
+    $html  = '<p class="form-row form-row-wide ayra-field ayra-dlv-field" id="billing_delivery_type_field" data-priority="' . esc_attr($args['priority']) . '">';
+    $html .= '<label class="ayra-dlv-group-label">' . esc_html($args['label']) . '&nbsp;<abbr class="required" title="مطلوب">*</abbr></label>';
+    $html .= '<span class="ayra-delivery-cards" id="ayra-delivery-cards">';
+    foreach ($args['options'] as $opt_val => $opt_label) {
+        $active = ($value === $opt_val) ? ' active' : '';
+        $html .= '<label class="ayra-dlv-card' . $active . '" data-type="' . esc_attr($opt_val) . '">';
+        $html .= '<input type="radio" class="ayra-dlv-radio" name="' . esc_attr($key) . '" id="' . esc_attr($key . '_' . $opt_val) . '" value="' . esc_attr($opt_val) . '" ' . checked($value, $opt_val, false) . '>';
+        $html .= '<span class="ayra-dlv-icon">' . (isset($icons[$opt_val]) ? $icons[$opt_val] : '') . '</span>';
+        $html .= '<span class="ayra-dlv-info">';
+        $html .= '<span class="ayra-dlv-name">' . esc_html($opt_label) . '</span>';
+        $html .= '<span class="ayra-dlv-time">' . (isset($times[$opt_val]) ? esc_html($times[$opt_val]) : '') . '</span>';
+        $html .= '<span class="ayra-dlv-price" data-type="' . esc_attr($opt_val) . '"></span>';
+        $html .= '</span>';
+        $html .= '<span class="ayra-dlv-check"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>';
+        $html .= '</label>';
+    }
+    $html .= '</span></p>';
+
+    return $html;
+}
+add_filter('woocommerce_form_field', 'ayra_render_delivery_type_cards', 10, 4);
 
 // ─── Save custom checkout fields ────────────────────────
 function ayra_save_custom_fields($order_id) {
@@ -160,6 +198,23 @@ function ayra_display_custom_fields_admin($order) {
 }
 add_action('woocommerce_admin_order_data_after_billing_address', 'ayra_display_custom_fields_admin');
 
+// ─── Free delivery threshold (activable in ZR settings) ─
+function ayra_is_free_shipping_active() {
+    if (get_option('ayra_free_shipping_enabled') !== 'yes') return false;
+    $min = (float) get_option('ayra_free_shipping_min', 15000);
+    if ($min <= 0) return false;
+    if (!function_exists('WC') || !WC()->cart) return false;
+    // Products subtotal only — fees excluded, so the check can't feed back on itself
+    return (float) WC()->cart->get_cart_contents_total() >= $min;
+}
+
+// ─── Show "التوصيل: مجاني" row in the order summary ─────
+function ayra_free_shipping_review_row() {
+    if (!ayra_is_free_shipping_active()) return;
+    echo '<tr class="fee ayra-free-shipping-row"><th>التوصيل</th><td data-title="التوصيل">مجاني ✓</td></tr>';
+}
+add_action('woocommerce_review_order_before_order_total', 'ayra_free_shipping_review_row');
+
 // ─── Add delivery fee to cart (uses ZR Express live pricing) ─
 function ayra_add_delivery_fee($cart) {
     if (is_admin() && !defined('DOING_AJAX')) return;
@@ -192,6 +247,11 @@ function ayra_add_delivery_fee($cart) {
         }
 
         $delivery_label = ($delivery_type === 'home') ? 'توصيل للمنزل' : 'توصيل للمكتب (StopDesk)';
+
+        // Free delivery promo: order total reached the configured threshold
+        if (ayra_is_free_shipping_active()) {
+            $delivery_fee = 0;
+        }
 
         if ($delivery_fee > 0) {
             $cart->add_fee($delivery_label, $delivery_fee);
@@ -502,19 +562,43 @@ function ayra_get_all_product_filter_data() {
     }
     
     // Step 4: Get categories for ALL products in ONE query (No get_the_terms loop!)
+    // Includes ANCESTOR categories, so selecting a parent category (e.g. "Packs")
+    // also matches products assigned only to its sub-categories.
+    $cat_slug_by_id   = [];
+    $cat_parent_by_id = [];
+    $cat_terms = $wpdb->get_results("
+        SELECT t.term_id, t.slug, tt.parent
+        FROM {$wpdb->terms} t
+        INNER JOIN {$wpdb->term_taxonomy} tt ON t.term_id = tt.term_id
+        WHERE tt.taxonomy = 'product_cat'
+    ");
+    foreach ($cat_terms as $ct) {
+        $cat_slug_by_id[(int) $ct->term_id]   = $ct->slug;
+        $cat_parent_by_id[(int) $ct->term_id] = (int) $ct->parent;
+    }
+
     $cat_map = [];
     $terms_results = $wpdb->get_results("
-        SELECT tr.object_id, t.slug 
+        SELECT tr.object_id, tt.term_id
         FROM {$wpdb->term_relationships} tr
         INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
-        INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
-        WHERE tt.taxonomy = 'product_cat' 
+        WHERE tt.taxonomy = 'product_cat'
         AND tr.object_id IN ({$ids_placeholder})
     ");
     foreach ($terms_results as $row) {
         $pid = (int) $row->object_id;
         if (!isset($cat_map[$pid])) $cat_map[$pid] = [];
-        $cat_map[$pid][] = $row->slug;
+        // Add the assigned term slug, then walk up its ancestors
+        $tid   = (int) $row->term_id;
+        $guard = 0;
+        while ($tid && isset($cat_slug_by_id[$tid]) && $guard < 10) {
+            $cat_map[$pid][] = $cat_slug_by_id[$tid];
+            $tid = isset($cat_parent_by_id[$tid]) ? $cat_parent_by_id[$tid] : 0;
+            $guard++;
+        }
+    }
+    foreach ($cat_map as $pid => $slugs) {
+        $cat_map[$pid] = array_values(array_unique($slugs));
     }
     
     // Step 5: Final output assembly
@@ -561,3 +645,7 @@ add_action('save_post_product', 'ayra_clear_size_caches');
 add_action('woocommerce_update_product', 'ayra_clear_size_caches');
 add_action('woocommerce_product_set_stock_status', 'ayra_clear_size_caches');
 add_action('woocommerce_variation_set_stock_status', 'ayra_clear_size_caches');
+// Category hierarchy changes must also refresh the cached filter data
+add_action('created_product_cat', 'ayra_clear_size_caches');
+add_action('edited_product_cat', 'ayra_clear_size_caches');
+add_action('delete_product_cat', 'ayra_clear_size_caches');

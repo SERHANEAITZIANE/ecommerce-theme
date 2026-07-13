@@ -485,10 +485,11 @@ add_filter( 'rocket_cache_ignored_parameters', function( $parameters ) {
     return $parameters;
 } );
 
-// Cache size-filtered shop pages separately
+// Cache size- and category-filtered shop pages separately
 add_filter( 'rocket_cache_query_strings', function( $query_strings ) {
     $query_strings[] = 'filter_size';
     $query_strings[] = 'post_type';
+    $query_strings[] = 'product_cat';
     return $query_strings;
 } );
 

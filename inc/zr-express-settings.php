@@ -32,6 +32,14 @@ function ayra_zr_register_settings()
 {
     register_setting('ayra_zr_settings', 'ayra_zr_tenant_id', ['sanitize_callback' => 'sanitize_text_field']);
     register_setting('ayra_zr_settings', 'ayra_zr_api_key', ['sanitize_callback' => 'sanitize_text_field']);
+    register_setting('ayra_zr_settings', 'ayra_free_shipping_enabled', [
+        'sanitize_callback' => function ($v) { return $v === 'yes' ? 'yes' : 'no'; },
+        'default' => 'no',
+    ]);
+    register_setting('ayra_zr_settings', 'ayra_free_shipping_min', [
+        'sanitize_callback' => 'absint',
+        'default' => 15000,
+    ]);
 }
 add_action('admin_init', 'ayra_zr_register_settings');
 
@@ -74,6 +82,36 @@ function ayra_zr_settings_page()
                             value="<?php echo esc_attr($key); ?>" class="regular-text" autocomplete="off"
                             placeholder="API Key">
                         <p class="description">X-Api-Key من إعدادات API في ZR Express</p>
+                    </td>
+                </tr>
+            </table>
+
+            <hr>
+            <h2>🚚 التوصيل المجاني (Livraison gratuite)</h2>
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px 18px;margin:12px 0 8px;">
+                <p style="margin:0;color:#166534;font-size:14px;">
+                    عند التفعيل، يصبح التوصيل <strong>مجانياً</strong> (منزل + مكتب StopDesk) لكل طلب يبلغ الحد الأدنى.
+                    يمكنك تفعيله أثناء العروض وإيقافه في أي وقت — يُطبَّق فوراً على صفحة الدفع.
+                </p>
+            </div>
+            <table class="form-table">
+                <tr>
+                    <th><label for="ayra_free_shipping_enabled">تفعيل التوصيل المجاني</label></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" id="ayra_free_shipping_enabled" name="ayra_free_shipping_enabled"
+                                value="yes" <?php checked(get_option('ayra_free_shipping_enabled', 'no'), 'yes'); ?>>
+                            مفعّل
+                        </label>
+                    </td>
+                </tr>
+                <tr>
+                    <th><label for="ayra_free_shipping_min">الحد الأدنى للطلب (دج)</label></th>
+                    <td>
+                        <input type="number" min="0" step="1" id="ayra_free_shipping_min" name="ayra_free_shipping_min"
+                            value="<?php echo esc_attr(get_option('ayra_free_shipping_min', 15000)); ?>" class="regular-text"
+                            placeholder="15000">
+                        <p class="description">مثال: 15000 دج — الطلبات (قيمة المنتجات) التي تبلغ هذا المبلغ تحصل على توصيل مجاني.</p>
                     </td>
                 </tr>
             </table>

@@ -593,6 +593,17 @@
         }
     };
 
+    // ─── Front page: category / packs browser ──────────
+    const HeroCategories = {
+        init() {
+            $(document).on('click', '.ayra-hero-cat.has-children > .ayra-hero-cat-btn', function () {
+                const $wrap = $(this).closest('.ayra-hero-cat');
+                $('.ayra-hero-cat.has-children').not($wrap).removeClass('open');
+                $wrap.toggleClass('open');
+            });
+        }
+    };
+
     // ─── Initialize All ─────────────────────────────────
     $(document).ready(function () {
         CartDrawer.init();
@@ -604,6 +615,7 @@
         FilterToggle.init();
         Search.init();
         HeroSearch.init();
+        HeroCategories.init();
     });
 
 })(jQuery);
