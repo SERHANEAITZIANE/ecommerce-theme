@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AYRA Homewear — Agent Portal</title>
+  <!-- Google Fonts: Inter & Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-main: #0b0f19;
+      --bg-card: #151c2c;
+      --bg-hover: #1e293b;
+      --border-color: #2a354f;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      
+      --color-new: #f59e0b;
+      --color-new-bg: rgba(245, 158, 11, 0.15);
+      
+      --color-call: #ea580c;
+      --color-call-bg: rgba(234, 88, 12, 0.15);
+      
+      --color-confirm: #10b981;
+      --color-confirm-bg: rgba(16, 185, 129, 0.15);
+      
+      --color-cancel: #ef4444;
+      --color-cancel-bg: rgba(239, 68, 68, 0.15);
+      
+      --color-sent: #3b82f6;
+      --color-sent-bg: rgba(59, 130, 246, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', 'Inter', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    header {
+      background-color: var(--bg-card);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--primary), #ec4899);
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+
+    .logo-text {
+      font-family: 'Cairo', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      background: linear-gradient(to left, #fff, #a5b4fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .agent-selector-bar {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-logout:hover {
+      border-color: var(--color-cancel);
+      color: var(--color-cancel);
+      background-color: var(--color-cancel-bg);
+    }
+
+    /* Screen: Login */
+    .screen {
+      display: none;
+      flex: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .screen.active {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .login-container {
+      margin: auto;
+      max-width: 450px;
+      width: 100%;
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 2.5rem;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .login-container h2 {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+    }
+
+    .login-container p {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .select-agent-dropdown {
+      width: 100%;
+      padding: 0.85rem 1rem;
+      background-color: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 1rem center;
+      background-size: 1.25rem;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 0.85rem;
+      background: linear-gradient(135deg, var(--primary), #4f46e5);
+      border: none;
+      border-radius: 12px;
+      color: white;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: opacity 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-login:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
+
+    /* Dashboard Header Controls */
+    .controls-panel {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .search-filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      flex: 1;
+      max-width: 800px;
+    }
+
+    .input-search {
+      flex: 2;
+      min-width: 200px;
+      padding: 0.75rem 1rem;
+      background-color: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-main);
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    .input-search:focus {
+      border-color: var(--primary);
+    }
+
+    .select-filter {
+      flex: 1;
+      min-width: 150px;
+      padding: 0.75rem 1.5rem 0.75rem 1rem;
+      background-color: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 0.75rem center;
+      background-size: 1rem;
+    }
+
+    .select-field {
+      padding: 0.45rem 1.5rem 0.45rem 0.5rem;
+      background-color: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-main);
+      outline: none;
+      cursor: pointer;
+      font-size: 0.85rem;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: left 0.5rem center;
+      background-size: 0.85rem;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    .select-field:focus {
+      border-color: var(--primary);
+    }
+
+    .stats-summary {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-val {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .stat-lbl {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* Order Feed */
+    .order-feed {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.5rem;
+      flex: 1;
+    }
+
+    @media (max-width: 768px) {
+      .order-feed {
+        grid-template-columns: 1fr;
+      }
+      .controls-panel {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .stats-summary {
+        justify-content: space-around;
+        border-top: 1px solid var(--border-color);
+        padding-top: 1rem;
+      }
+    }
+
+    /* Order Card styling */
+    .order-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      position: relative;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .order-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.3);
+      border-color: #3b4c74;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+    }
+
+    .order-id-date {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .order-id {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
+    .order-date {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .status-badge {
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .badge-new {
+      background-color: var(--color-new-bg);
+      color: var(--color-new);
+    }
+    .badge-call {
+      background-color: var(--color-call-bg);
+      color: var(--color-call);
+    }
+    .badge-confirm {
+      background-color: var(--color-confirm-bg);
+      color: var(--color-confirm);
+    }
+    .badge-cancel {
+      background-color: var(--color-cancel-bg);
+      color: var(--color-cancel);
+    }
+    .badge-sent {
+      background-color: var(--color-sent-bg);
+      color: var(--color-sent);
+    }
+    .badge-loading {
+      background-color: rgba(254, 243, 199, 0.15);
+      color: #fbbf24;
+    }
+
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+    }
+
+    .customer-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      background-color: rgba(0, 0, 0, 0.15);
+      padding: 0.75rem;
+      border-radius: 8px;
+    }
+
+    .cust-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .cust-label {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    .cust-val {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .phone-link {
+      color: #818cf8 !important;
+      text-decoration: none;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .phone-link:hover {
+      text-decoration: underline;
+    }
+
+    .product-list {
+      border: 1px dashed var(--border-color);
+      padding: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      max-height: 120px;
+      overflow-y: auto;
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .total-pricing {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1rem;
+      font-weight: 700;
+      border-top: 1px solid var(--border-color);
+      padding-top: 0.5rem;
+    }
+
+    .grand-total {
+      color: var(--primary);
+    }
+
+    /* Action Buttons Area */
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-top: auto;
+    }
+
+    .quick-status-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+
+    .btn-action {
+      padding: 0.6rem;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      transition: opacity 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-action:hover {
+      opacity: 0.9;
+    }
+
+    .btn-action:active {
+      transform: scale(0.98);
+    }
+
+    .btn-confirm {
+      background-color: var(--color-confirm-bg);
+      color: var(--color-confirm);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-cancel {
+      background-color: var(--color-cancel-bg);
+      color: var(--color-cancel);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .call-logging-bar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.35rem;
+    }
+
+    .btn-call-log {
+      padding: 0.45rem 0.25rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-main);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-call-log.logged {
+      background-color: var(--color-call-bg);
+      color: var(--color-call);
+      border-color: var(--color-call);
+      font-weight: bold;
+    }
+
+    .btn-call-log:hover:not(.logged) {
+      border-color: var(--color-call);
+      color: var(--color-call);
+      background-color: rgba(234, 88, 12, 0.05);
+    }
+
+    .communication-links {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .btn-wa {
+      background-color: rgba(22, 163, 74, 0.15);
+      color: #22c55e;
+      border: 1px solid rgba(22, 163, 74, 0.3);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.6rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: opacity 0.2s ease;
+    }
+
+    .btn-wa:hover {
+      opacity: 0.9;
+    }
+
+    .btn-zr {
+      background: linear-gradient(135deg, var(--primary), #3b82f6);
+      color: white;
+      box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+    }
+
+    .tracking-box {
+      background-color: var(--color-sent-bg);
+      color: var(--color-sent);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 0.6rem;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    /* Notes Area */
+    .notes-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .notes-textarea {
+      width: 100%;
+      background-color: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-main);
+      padding: 0.5rem;
+      font-size: 0.8rem;
+      resize: vertical;
+      min-height: 45px;
+      outline: none;
+    }
+
+    .notes-textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .notes-save-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn-save-notes {
+      padding: 0.3rem 0.75rem;
+      background-color: var(--bg-main);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-save-notes:hover {
+      border-color: var(--primary);
+      color: #fff;
+      background-color: rgba(99, 102, 241, 0.1);
+    }
+
+    .notes-indicator {
+      font-size: 0.7rem;
+      color: var(--color-confirm);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Loading Screen & Toast Feedback */
+    .loading-container {
+      margin: auto;
+      text-align: center;
+      padding: 3rem;
+    }
+
+    .spinner {
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border-left-color: var(--primary);
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .no-orders-message {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+      background-color: var(--bg-card);
+      border: 1px dashed var(--border-color);
+      border-radius: 16px;
+    }
+
+    .no-orders-message h3 {
+      font-size: 1.25rem;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .toast {
+      background-color: #1e293b;
+      border-right: 4px solid var(--primary);
+      padding: 0.85rem 1.25rem;
+      border-radius: 8px;
+      color: #fff;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast.active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.success { border-right-color: var(--color-confirm); }
+    .toast.error { border-right-color: var(--color-cancel); }
+    .toast.warning { border-right-color: var(--color-new); }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Bar -->
+  <header>
+    <div class="logo-container">
+      <div class="logo-badge">A</div>
+      <div class="logo-text">موقع تأكيد الطلبات AYRA</div>
+    </div>
+    
+    <div class="agent-selector-bar" id="header-agent-info" style="display:none;">
+      <span style="font-weight:600;"><span id="active-agent-name">C1</span> 👤</span>
+      <button class="btn-logout" onclick="logout()">خروج</button>
+    </div>
+  </header>
+
+  <!-- Screen 1: Agent Selection Login -->
+  <div id="screen-login" class="screen active">
+    <div class="login-container">
+      <h2>مرحباً بك</h2>
+      <p>يرجى اختيار اسم المستخدم للبدء</p>
+      
+      <select id="login-agent-select" class="select-agent-dropdown">
+        <? if (typeof agents !== 'undefined') { ?>
+          <? for (var i = 0; i < agents.length; i++) { ?>
+            <option value="<?= agents[i] ?>"><?= agents[i] ?></option>
+          <? } ?>
+        <? } else { ?>
+          <option value="C1">C1</option>
+          <option value="C2">C2</option>
+        <? } ?>
+      </select>
+      
+      <button class="btn-login" onclick="login()">دخول</button>
+    </div>
+  </div>
+
+  <!-- Screen 2: Loader screen -->
+  <div id="screen-loader" class="screen">
+    <div class="loading-container">
+      <div class="spinner"></div>
+      <p>جاري تحميل الطلبات...</p>
+    </div>
+  </div>
+
+  <!-- Screen 3: Main Dashboard -->
+  <div id="screen-dashboard" class="screen">
+    
+    <!-- Controls (Search, Filter, Stats) -->
+    <div class="controls-panel">
+      <div class="search-filter-group">
+        <input type="text" id="search-input" class="input-search" placeholder="ابحث باسم المشتري أو رقم الهاتف..." oninput="filterOrders()">
+        
+        <select id="status-filter" class="select-filter" onchange="filterOrders()">
+          <option value="ALL">جميع الحالات</option>
+          <option value="جديد 🆕">جديد 🆕</option>
+          <option value="محاولة 1 📞">محاولة 1 📞</option>
+          <option value="محاولة 2 📞">محاولة 2 📞</option>
+          <option value="محاولة 3 📞">محاولة 3 📞</option>
+          <option value="✅ مؤكد">✅ مؤكد</option>
+          <option value="❌ ملغي">❌ ملغي</option>
+          <option value="📦 تم الإرسال">📦 تم الإرسال</option>
+        </select>
+      </div>
+      
+      <div class="stats-summary">
+        <div class="stat-item">
+          <div class="stat-val" id="stat-pending">0</div>
+          <div class="stat-lbl">الانتظار</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" id="stat-confirmed" style="color:var(--color-confirm);">0</div>
+          <div class="stat-lbl">مؤكد</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-val" id="stat-total">0</div>
+          <div class="stat-lbl">المجموع</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Grid Feed -->
+    <div class="order-feed" id="orders-grid">
+      <!-- Injected dynamically -->
+    </div>
+  </div>
+
+  <!-- Toast Feedbacks -->
+  <div class="toast-container" id="toast-area"></div>
+
+  <!-- Script logic -->
+  <script>
+    let allOrders = [];
+    let currentAgent = '';
+
+    // Check if agent was already logged in
+    window.onload = function() {
+      const savedAgent = localStorage.getItem('ayra_agent');
+      if (savedAgent) {
+        document.getElementById('login-agent-select').value = savedAgent;
+        login();
+      }
+    };
+
+    function showScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+    }
+
+    function login() {
+      const select = document.getElementById('login-agent-select');
+      currentAgent = select.value;
+      if (!currentAgent) return;
+      
+      localStorage.setItem('ayra_agent', currentAgent);
+      document.getElementById('active-agent-name').textContent = currentAgent;
+      document.getElementById('header-agent-info').style.display = 'flex';
+      
+      loadOrders();
+    }
+
+    function logout() {
+      localStorage.removeItem('ayra_agent');
+      document.getElementById('header-agent-info').style.display = 'none';
+      allOrders = [];
+      showScreen('screen-login');
+      showToast('تم تسجيل الخروج بنجاح', 'success');
+    }
+
+    function loadOrders() {
+      showScreen('screen-loader');
+      
+      google.script.run
+        .withSuccessHandler(function(orders) {
+          allOrders = orders;
+          renderOrders();
+          showScreen('screen-dashboard');
+        })
+        .withFailureHandler(function(error) {
+          showScreen('screen-login');
+          showToast('فشل جلب الطلبات: ' + error.message, 'error');
+        })
+        .portal_getAgentOrders(currentAgent);
+    }
+
+    function renderOrders() {
+      const grid = document.getElementById('orders-grid');
+      grid.innerHTML = '';
+      
+      // Calculate Stats
+      let pendingCount = 0;
+      let confirmedCount = 0;
+      
+      const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+      const statusFilter = document.getElementById('status-filter').value;
+      
+      let filtered = allOrders.filter(order => {
+        // Stats calculations on all orders
+        const status = order.status || '';
+        if (status.indexOf('جديد') > -1 || status.indexOf('محاولة') > -1) {
+          pendingCount++;
+        }
+        if (status.indexOf('مؤكد') > -1 || status.indexOf('تم الإرسال') > -1) {
+          confirmedCount++;
+        }
+
+        // Apply filters
+        const matchesSearch = 
+          order.orderId.toLowerCase().includes(searchTerm) ||
+          order.name.toLowerCase().includes(searchTerm) ||
+          order.phone.toLowerCase().includes(searchTerm) ||
+          order.products.toLowerCase().includes(searchTerm);
+          
+        const matchesStatus = (statusFilter === 'ALL' || order.status === statusFilter);
+        
+        return matchesSearch && matchesStatus;
+      });
+
+      // Update counters in layout
+      document.getElementById('stat-pending').textContent = pendingCount;
+      document.getElementById('stat-confirmed').textContent = confirmedCount;
+      document.getElementById('stat-total').textContent = allOrders.length;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="no-orders-message">
+            <h3>لا توجد طلبات</h3>
+            <p>لا توجد طلبات تطابق معايير البحث أو التصفية الحالية.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(order => {
+        const card = document.createElement('div');
+        card.className = 'order-card';
+        card.id = `order-row-${order.rowNum}`;
+        
+        // Status Badge Style class
+        let badgeClass = 'badge-new';
+        if (order.status.includes('مؤكد')) badgeClass = 'badge-confirm';
+        else if (order.status.includes('ملغي')) badgeClass = 'badge-cancel';
+        else if (order.status.includes('محاولة')) badgeClass = 'badge-call';
+        else if (order.status.includes('تم الإرسال')) badgeClass = 'badge-sent';
+        else if (order.status.includes('جاري')) badgeClass = 'badge-loading';
+
+        // Call Attempt values logged
+        const call1Text = order.call1 ? `1️⃣ ${order.call1}` : 'محاولة 1';
+        const call2Text = order.call2 ? `2️⃣ ${order.call2}` : 'محاولة 2';
+        const call3Text = order.call3 ? `3️⃣ ${order.call3}` : 'محاولة 3';
+
+        const hasTracking = order.zrTracking && order.zrTracking.trim() !== '';
+        const isConfirmed = order.status.includes('مؤكد');
+
+        // Formats currency nicely
+        const totalFormatted = Number(order.grandTotal).toLocaleString('ar-DZ') + ' د.ج';
+        const productFeeFormatted = Number(order.productsPrice).toLocaleString('ar-DZ') + ' د.ج';
+        const deliveryFeeFormatted = Number(order.deliveryFee).toLocaleString('ar-DZ') + ' د.ج';
+
+        // Clean WhatsApp text and click to link
+        // Extract raw number
+        const phoneDigits = order.phone.replace(/[^0-9]/g, '');
+        
+        card.innerHTML = `
+          <div class="card-header">
+            <div class="order-id-date">
+              <span class="order-id">طلب ${order.orderId}</span>
+              <span class="order-date">${order.date}</span>
+            </div>
+            <span class="status-badge ${badgeClass}" id="badge-${order.rowNum}">${order.status}</span>
+          </div>
+
+          <div class="card-body">
+            <div class="customer-info">
+              <div class="cust-row">
+                <span class="cust-label">الاسم:</span>
+                <span class="cust-val">${order.name}</span>
+              </div>
+              <div class="cust-row">
+                <span class="cust-label">الهاتف:</span>
+                <a class="phone-link" href="tel:+${phoneDigits}">📞 ${order.phone}</a>
+              </div>
+              <div class="cust-row">
+                <span class="cust-label">طريقة التوصيل:</span>
+                <select class="select-field" style="width: auto; max-width: 140px;" id="delivery-type-${order.rowNum}" onchange="changeDeliveryDetails(${order.rowNum})">
+                  <option value="منزل 🏠" ${order.deliveryType === 'منزل 🏠' ? 'selected' : ''}>منزل 🏠</option>
+                  <option value="مكتب 📦" ${order.deliveryType === 'مكتب 📦' ? 'selected' : ''}>مكتب 📦</option>
+                </select>
+              </div>
+              <div class="cust-row">
+                <span class="cust-label">الولاية:</span>
+                <span class="cust-val">${order.wilaya}</span>
+              </div>
+              <div class="cust-row" style="flex-direction: column; align-items: stretch; gap: 0.25rem;">
+                <span class="cust-label">البلدية / مكتب التوصيل:</span>
+                <select class="select-field" id="commune-${order.rowNum}" onchange="saveCommune(${order.rowNum})">
+                  ${order.communeOptions.map(opt => `
+                    <option value="${opt}" ${opt === order.commune ? 'selected' : ''}>${opt}</option>
+                  `).join('')}
+                </select>
+              </div>
+            </div>
+
+            <div class="product-list">
+              <strong>المنتجات:</strong><br>
+              ${order.products.replace(/ \| /g, '<br>')}
+            </div>
+
+            <div class="pricing-details" style="font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; border-top: 1px dashed var(--border-color); padding-top: 0.5rem; margin-top: 0.5rem;">
+              <span>المنتجات: <span id="prod-price-${order.rowNum}">${productFeeFormatted}</span></span>
+              <span>التوصيل: <span id="del-fee-${order.rowNum}">${deliveryFeeFormatted}</span></span>
+            </div>
+
+            <div class="total-pricing">
+              <span>الإجمالي:</span>
+              <span class="grand-total" id="grand-total-${order.rowNum}">${totalFormatted}</span>
+            </div>
+            
+            <div class="notes-section">
+              <label class="cust-label" style="font-size:0.8rem;">ملاحظات:</label>
+              <textarea class="notes-textarea" id="notes-${order.rowNum}">${order.notes}</textarea>
+              <div class="notes-save-container">
+                <span class="notes-indicator" id="notes-indicator-${order.rowNum}">تم الحفظ!</span>
+                <button class="btn-save-notes" onclick="saveNotes(${order.rowNum})">حفظ الملاحظة</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <!-- Call attempts loggers -->
+            <div class="call-logging-bar">
+              <button class="btn-call-log ${order.call1 ? 'logged' : ''}" id="btn-call-1-${order.rowNum}" onclick="logCall(${order.rowNum}, 1)">${call1Text}</button>
+              <button class="btn-call-log ${order.call2 ? 'logged' : ''}" id="btn-call-2-${order.rowNum}" onclick="logCall(${order.rowNum}, 2)">${call2Text}</button>
+              <button class="btn-call-log ${order.call3 ? 'logged' : ''}" id="btn-call-3-${order.rowNum}" onclick="logCall(${order.rowNum}, 3)">${call3Text}</button>
+            </div>
+
+            <div class="communication-links">
+              <a class="btn-wa" href="${order.whatsappLink}" target="_blank">📱 إرسال واتساب</a>
+            </div>
+
+            <div class="quick-status-buttons" id="quick-actions-${order.rowNum}">
+              ${!hasTracking ? `
+                <button class="btn-action btn-confirm" onclick="updateStatus(${order.rowNum}, '✅ مؤكد')">تأكيد الطلب</button>
+                <button class="btn-action btn-cancel" onclick="updateStatus(${order.rowNum}, '❌ ملغي')">إلغاء الطلب</button>
+              ` : ''}
+            </div>
+
+            <!-- ZR Action button -->
+            <div id="zr-container-${order.rowNum}">
+              ${hasTracking ? `
+                <div class="tracking-box">📦 رقم التتبع: ${order.zrTracking}</div>
+              ` : isConfirmed ? `
+                <button class="btn-action btn-zr" onclick="sendToZR(${order.rowNum})">📦 إرسال إلى ZR Express</button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+        
+        grid.appendChild(card);
+      });
+    }
+
+    function filterOrders() {
+      renderOrders();
+    }
+
+    // Server Call: Update Notes
+    function saveNotes(rowNum) {
+      const notesVal = document.getElementById(`notes-${rowNum}`).value;
+      const indicator = document.getElementById(`notes-indicator-${rowNum}`);
+      
+      google.script.run
+        .withSuccessHandler(function() {
+          // Update cached values
+          const order = allOrders.find(o => o.rowNum === rowNum);
+          if (order) order.notes = notesVal;
+          
+          indicator.style.opacity = 1;
+          setTimeout(() => indicator.style.opacity = 0, 2000);
+          showToast('تم حفظ الملاحظة بنجاح', 'success');
+        })
+        .withFailureHandler(function(err) {
+          showToast('فشل حفظ الملاحظة: ' + err.message, 'error');
+        })
+        .portal_updateOrderField(rowNum, 'NOTES', notesVal);
+    }
+
+    // Server Call: Update Status
+    function updateStatus(rowNum, statusVal) {
+      const badge = document.getElementById(`badge-${rowNum}`);
+      const zrContainer = document.getElementById(`zr-container-${rowNum}`);
+      
+      badge.textContent = '⏳ جاري الحفظ...';
+      badge.className = 'status-badge badge-loading';
+      
+      google.script.run
+        .withSuccessHandler(function() {
+          // Update cached values
+          const order = allOrders.find(o => o.rowNum === rowNum);
+          if (order) {
+            order.status = statusVal;
+          }
+          
+          // Re-render to update badges and action layouts
+          renderOrders();
+          showToast('تم تحديث حالة الطلب', 'success');
+        })
+        .withFailureHandler(function(err) {
+          renderOrders(); // Restore layout
+          showToast('فشل تحديث الحالة: ' + err.message, 'error');
+        })
+        .portal_updateOrderField(rowNum, 'STATUS', statusVal);
+    }
+
+    // Server Call: Log Call Attempts
+    function logCall(rowNum, attemptNum) {
+      const btn = document.getElementById(`btn-call-${attemptNum}-${rowNum}`);
+      const originalText = btn.textContent;
+      btn.textContent = '⏳..';
+      
+      google.script.run
+        .withSuccessHandler(function(res) {
+          const order = allOrders.find(o => o.rowNum === rowNum);
+          if (order) {
+            order.status = res.status;
+            order[`call${attemptNum}`] = res.timestamp;
+          }
+          
+          renderOrders();
+          showToast(`تم تسجيل المحاولة ${attemptNum}`, 'success');
+        })
+        .withFailureHandler(function(err) {
+          btn.textContent = originalText;
+          showToast('فشل تسجيل المحاولة: ' + err.message, 'error');
+        })
+        .portal_logCallAttempt(rowNum, attemptNum);
+    }
+
+    // Server Call: Send to ZR Express
+    function sendToZR(rowNum) {
+      const badge = document.getElementById(`badge-${rowNum}`);
+      const zrContainer = document.getElementById(`zr-container-${rowNum}`);
+      
+      badge.textContent = '⏳ جاري الإرسال...';
+      badge.className = 'status-badge badge-loading';
+      zrContainer.innerHTML = '<button class="btn-action btn-zr" disabled>⏳ جاري إرسال الطلب لـ ZR...</button>';
+      
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res.success) {
+            const order = allOrders.find(o => o.rowNum === rowNum);
+            if (order) {
+              order.status = '📦 تم الإرسال';
+              order.zrTracking = res.tracking;
+            }
+            renderOrders();
+            showToast('تم إرسال الطلب بنجاح لـ ZR Express!', 'success');
+          } else {
+            renderOrders(); // Reset
+            showToast('فشل الإرسال: ' + res.error, 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          renderOrders(); // Reset
+          showToast('فشل معالجة الإرسال: ' + err.message, 'error');
+        })
+        .portal_sendOrderToZR(rowNum);
+    }
+
+    // Server Call: Change Delivery Type
+    function changeDeliveryDetails(rowNum) {
+      const typeVal = document.getElementById(`delivery-type-${rowNum}`).value;
+      const communeSelect = document.getElementById(`commune-${rowNum}`);
+      
+      communeSelect.disabled = true;
+      communeSelect.innerHTML = '<option>جاري تحميل البلديات...</option>';
+      
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res.success) {
+            // Update cached values
+            const order = allOrders.find(o => o.rowNum === rowNum);
+            if (order) {
+              order.deliveryType = res.deliveryType;
+              order.commune = res.commune;
+              order.deliveryFee = res.deliveryFee;
+              order.grandTotal = res.grandTotal;
+              order.communeOptions = res.options;
+            }
+            
+            // Re-render to update the display (dropdown options, pricing details)
+            renderOrders();
+            showToast('تم تحديث طريقة التوصيل وإعادة حساب السعر', 'success');
+          } else {
+            renderOrders();
+            showToast('فشل تحديث طريقة التوصيل', 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          renderOrders();
+          showToast('حدث خطأ: ' + err.message, 'error');
+        })
+        .portal_updateDeliveryDetails(rowNum, typeVal, '');
+    }
+
+    // Server Call: Save Commune
+    function saveCommune(rowNum) {
+      const communeVal = document.getElementById(`commune-${rowNum}`).value;
+      
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res.success) {
+            // Update cached values
+            const order = allOrders.find(o => o.rowNum === rowNum);
+            if (order) {
+              order.commune = res.commune;
+            }
+            showToast('تم حفظ البلدية/المكتب بنجاح', 'success');
+          } else {
+            showToast('فشل حفظ البلدية/المكتب', 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          showToast('حدث خطأ: ' + err.message, 'error');
+        })
+        .portal_updateDeliveryDetails(rowNum, '', communeVal);
+    }
+
+    // Feedback Toast system
+    function showToast(message, type = 'info') {
+      const area = document.getElementById('toast-area');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      let icon = 'ℹ️';
+      if (type === 'success') icon = '✅';
+      else if (type === 'error') icon = '❌';
+      else if (type === 'warning') icon = '⚠️';
+      
+      toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+      area.appendChild(toast);
+      
+      // Trigger animation
+      setTimeout(() => toast.classList.add('active'), 10);
+      
+      // Auto destroy
+      setTimeout(() => {
+        toast.classList.remove('active');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+  </script>
+</body>
+</html>

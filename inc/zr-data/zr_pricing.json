@@ -1,0 +1,479 @@
+﻿[
+    {
+        "territory_id":  "6e978fc5-f20a-4b5f-9adf-61dd21a7672a",
+        "territory_code":  1,
+        "territory_name":  "Adrar",
+        "territory_level":  "wilaya",
+        "price_home":  1450,
+        "price_stopdesk":  900,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "981f136a-996f-463e-a536-8e643daab193",
+        "territory_code":  2,
+        "territory_name":  "Chlef",
+        "territory_level":  "wilaya",
+        "price_home":  600,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "00b5ef4b-ae2e-4b7f-bd26-70c1a376b69b",
+        "territory_code":  3,
+        "territory_name":  "Laghouat",
+        "territory_level":  "wilaya",
+        "price_home":  1000,
+        "price_stopdesk":  600,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "37c70742-df6b-4019-981a-a16a29a14748",
+        "territory_code":  4,
+        "territory_name":  "Oum El Bouaghi",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "a8c05822-e30a-4d5a-bcb3-3b3bb23c079b",
+        "territory_code":  5,
+        "territory_name":  "Batna",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "295585ad-4cf4-4b7e-b276-9bb62d019749",
+        "territory_code":  6,
+        "territory_name":  "Bejaia",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "796e70df-1102-44da-9582-2da66ead2ba6",
+        "territory_code":  7,
+        "territory_name":  "Biskra",
+        "territory_level":  "wilaya",
+        "price_home":  1000,
+        "price_stopdesk":  600,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "e740c188-2bbc-4206-8999-302b17dc0e4b",
+        "territory_code":  8,
+        "territory_name":  "Bechar",
+        "territory_level":  "wilaya",
+        "price_home":  1150,
+        "price_stopdesk":  650,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "a7e764cf-e9ca-4c1f-8232-89852d102aec",
+        "territory_code":  9,
+        "territory_name":  "Blida",
+        "territory_level":  "wilaya",
+        "price_home":  750,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "a1f0229c-4f34-40aa-9238-fadde6757cba",
+        "territory_code":  10,
+        "territory_name":  "Bouira",
+        "territory_level":  "wilaya",
+        "price_home":  800,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "38560f06-e049-4fd2-9664-a655e552b517",
+        "territory_code":  11,
+        "territory_name":  "Tamanrasset",
+        "territory_level":  "wilaya",
+        "price_home":  1650,
+        "price_stopdesk":  1050,
+        "price_return":  250
+    },
+    {
+        "territory_id":  "5afdfab6-e505-4691-abc7-5e8bd79afad5",
+        "territory_code":  12,
+        "territory_name":  "Tebessa",
+        "territory_level":  "wilaya",
+        "price_home":  900,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "53c9e062-9c4e-4c77-8b71-55eabf887f83",
+        "territory_code":  13,
+        "territory_name":  "Tlemcen",
+        "territory_level":  "wilaya",
+        "price_home":  900,
+        "price_stopdesk":  500,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "ada5bb27-ffe5-4977-a917-3105c2b3d9c6",
+        "territory_code":  14,
+        "territory_name":  "Tiaret",
+        "territory_level":  "wilaya",
+        "price_home":  750,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "5bef8e95-fad8-4a15-95f0-8d6f5c80f69e",
+        "territory_code":  15,
+        "territory_name":  "Tizi Ouzou",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "d134c182-7dac-4655-9d9b-bbdb62aa2ec4",
+        "territory_code":  16,
+        "territory_name":  "Alger",
+        "territory_level":  "wilaya",
+        "price_home":  650,
+        "price_stopdesk":  350,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "9ee8eac2-77e5-4d70-ac49-bde455d06bee",
+        "territory_code":  17,
+        "territory_name":  "Djelfa",
+        "territory_level":  "wilaya",
+        "price_home":  1000,
+        "price_stopdesk":  600,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "dc851e52-55b2-4beb-a7f1-79d4e73e9458",
+        "territory_code":  18,
+        "territory_name":  "Jijel",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "56ee938d-7887-408e-8731-364d07ad3594",
+        "territory_code":  19,
+        "territory_name":  "Setif",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "27b2042a-77f8-4c91-b62d-60934fa0daca",
+        "territory_code":  20,
+        "territory_name":  "Saida",
+        "territory_level":  "wilaya",
+        "price_home":  800,
+        "price_stopdesk":  500,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "a9df7e26-1086-4319-8a93-19969c99c89b",
+        "territory_code":  21,
+        "territory_name":  "Skikda",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "2cec2b2a-cc37-480a-9183-59fdfdb65cd4",
+        "territory_code":  22,
+        "territory_name":  "Sidi Bel Abbes",
+        "territory_level":  "wilaya",
+        "price_home":  800,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "3fd318e8-7c24-480c-a106-21f6c842583d",
+        "territory_code":  23,
+        "territory_name":  "Annaba",
+        "territory_level":  "wilaya",
+        "price_home":  900,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "2d1e61ff-e2af-4b4d-a592-0a6436c5fffd",
+        "territory_code":  24,
+        "territory_name":  "Guelma",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "e9a1e9cf-8475-4768-94cc-0888d094ff47",
+        "territory_code":  25,
+        "territory_name":  "Constantine",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "0e0f2d43-6d78-47dd-8bb7-0f2771cb97ff",
+        "territory_code":  26,
+        "territory_name":  "Medea",
+        "territory_level":  "wilaya",
+        "price_home":  800,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "d7175ca6-6dd7-4dfb-a399-d388e782473a",
+        "territory_code":  27,
+        "territory_name":  "Mostaganem",
+        "territory_level":  "wilaya",
+        "price_home":  750,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "75ca308d-ab36-44e2-9702-2e2300a57b8c",
+        "territory_code":  28,
+        "territory_name":  "MSila",
+        "territory_level":  "wilaya",
+        "price_home":  900,
+        "price_stopdesk":  500,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "a17a6482-3f48-4948-aaf2-8a653c4c1110",
+        "territory_code":  29,
+        "territory_name":  "Mascara",
+        "territory_level":  "wilaya",
+        "price_home":  750,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "ada333a0-708d-476e-a97d-fd70fe661b09",
+        "territory_code":  30,
+        "territory_name":  "Ouargla",
+        "territory_level":  "wilaya",
+        "price_home":  1000,
+        "price_stopdesk":  600,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "e772eb46-276a-4f41-bae7-3b67e1bdc616",
+        "territory_code":  31,
+        "territory_name":  "Oran",
+        "territory_level":  "wilaya",
+        "price_home":  750,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "dca8b699-ce8b-4ad7-b8f2-560e63911383",
+        "territory_code":  32,
+        "territory_name":  "El Bayadh",
+        "territory_level":  "wilaya",
+        "price_home":  1100,
+        "price_stopdesk":  600,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "80d1b557-03b2-4073-a8c2-89a8712a7fc8",
+        "territory_code":  34,
+        "territory_name":  "Bordj Bou Arreridj",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "f823492c-f79d-4c2d-befe-933bf9917a65",
+        "territory_code":  35,
+        "territory_name":  "Boumerdes",
+        "territory_level":  "wilaya",
+        "price_home":  800,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "e6f4b09c-f63e-42af-92bc-dab9b422c34d",
+        "territory_code":  36,
+        "territory_name":  "El Tarf",
+        "territory_level":  "wilaya",
+        "price_home":  900,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "fb1a9f7a-81a2-4825-af92-79f9d187637f",
+        "territory_code":  38,
+        "territory_name":  "Tissemsilt",
+        "territory_level":  "wilaya",
+        "price_home":  750,
+        "price_stopdesk":  520,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "cd82549a-b1f7-48c1-9a25-2f3f05b80b1d",
+        "territory_code":  39,
+        "territory_name":  "El Oued",
+        "territory_level":  "wilaya",
+        "price_home":  1000,
+        "price_stopdesk":  600,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "d4549528-8327-4a3f-9732-5a5462c84b8d",
+        "territory_code":  40,
+        "territory_name":  "Khenchela",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "56d30b7a-465a-462c-bc2a-3e132c89be63",
+        "territory_code":  41,
+        "territory_name":  "Souk Ahras",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "1435179a-6dbb-4d9c-a186-c521b2a57319",
+        "territory_code":  42,
+        "territory_name":  "Tipaza",
+        "territory_level":  "wilaya",
+        "price_home":  800,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "0c8476c5-bbe4-46e4-80e5-67d3501195cc",
+        "territory_code":  43,
+        "territory_name":  "Mila",
+        "territory_level":  "wilaya",
+        "price_home":  850,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "ecdf0888-0470-4b2f-beb8-24c99b6fc9cb",
+        "territory_code":  45,
+        "territory_name":  "Naama",
+        "territory_level":  "wilaya",
+        "price_home":  1100,
+        "price_stopdesk":  600,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "fc460ec5-3e71-489c-b95b-e5301ea68341",
+        "territory_code":  46,
+        "territory_name":  "Ain Temouchent",
+        "territory_level":  "wilaya",
+        "price_home":  800,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "e7b51620-74f4-4748-85c5-216fb9b01b03",
+        "territory_code":  47,
+        "territory_name":  "Ghardaia",
+        "territory_level":  "wilaya",
+        "price_home":  1000,
+        "price_stopdesk":  600,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "ad58c5ee-868d-4acb-8f03-409f97a10370",
+        "territory_code":  48,
+        "territory_name":  "Relizane",
+        "territory_level":  "wilaya",
+        "price_home":  650,
+        "price_stopdesk":  450,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "bcb30485-37b5-4135-a508-acad8a8a9cf8",
+        "territory_code":  49,
+        "territory_name":  "Timimoun",
+        "territory_level":  "wilaya",
+        "price_home":  1450,
+        "price_stopdesk":  900,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "0f2dab00-094c-412c-a7d0-ebd0268d3d3c",
+        "territory_code":  51,
+        "territory_name":  "Ouled Djellal",
+        "territory_level":  "wilaya",
+        "price_home":  1000,
+        "price_stopdesk":  550,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "ba12c65c-de9e-4f30-a449-6ba0b27dd7d7",
+        "territory_code":  52,
+        "territory_name":  "Beni Abbes",
+        "territory_level":  "wilaya",
+        "price_home":  1200,
+        "price_stopdesk":  900,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "7c752560-8412-4e11-8c75-ed7cd9c22be2",
+        "territory_code":  53,
+        "territory_name":  "In Salah",
+        "territory_level":  "wilaya",
+        "price_home":  1650,
+        "price_stopdesk":  1120,
+        "price_return":  250
+    },
+    {
+        "territory_id":  "f30136dc-3012-4ac7-912c-33eab37393a9",
+        "territory_code":  54,
+        "territory_name":  "In Guezzam",
+        "territory_level":  "wilaya",
+        "price_home":  1650,
+        "price_stopdesk":  0,
+        "price_return":  250
+    },
+    {
+        "territory_id":  "442d8a1c-2e12-4a8a-9c7e-8618aac20280",
+        "territory_code":  55,
+        "territory_name":  "Touggourt",
+        "territory_level":  "wilaya",
+        "price_home":  1000,
+        "price_stopdesk":  600,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "eabb6505-5eef-479f-b6a3-36ba282d5237",
+        "territory_code":  57,
+        "territory_name":  "El Meghaier",
+        "territory_level":  "wilaya",
+        "price_home":  1000,
+        "price_stopdesk":  0,
+        "price_return":  200
+    },
+    {
+        "territory_id":  "3d19d427-08f3-492c-a1d0-e7ace3516ed2",
+        "territory_code":  58,
+        "territory_name":  "El Menia",
+        "territory_level":  "wilaya",
+        "price_home":  1050,
+        "price_stopdesk":  670,
+        "price_return":  200
+    }
+]
