@@ -27,10 +27,14 @@
         }
         $hint.html('<span class="ayra-size-hint-arrow">☝️</span>' + (message || 'اختاري مقاسكِ أوّلاً'));
 
-        // Let the panel finish expanding, then scroll + pulse + reveal hint
+        // Anchor the scroll to the filter BAR (its position is stable even while
+        // the mobile panel is animating open); fall back to the size section.
+        const $scrollTarget = $bar.length ? $bar : $filter;
+
+        // Let the panel begin expanding, then scroll + pulse + reveal hint
         setTimeout(function () {
             const headerOffset = 120;
-            const top = Math.max(0, $filter.offset().top - headerOffset);
+            const top = Math.max(0, $scrollTarget.offset().top - headerOffset);
             window.scrollTo({ top: top, behavior: 'smooth' });
             $filter.addClass('ayra-pulse-focus');
             setTimeout(function () { $filter.removeClass('ayra-pulse-focus'); }, 2500);
@@ -238,9 +242,14 @@
                             $btn.removeClass('success loading');
                         }, 2000);
                     } else {
-                        AddToCart.showNotice(res.data.message, 'error');
                         $btn.html(originalHTML);
                         $btn.removeClass('loading');
+                        // No size chosen → guide the shopper up to the size filter
+                        // instead of showing a red error toast.
+                        if (res.data && res.data.need_size) {
+                            if (ayraPromptSize('اختاري مقاسكِ أوّلاً لإضافة المنتج للسلة')) return;
+                        }
+                        AddToCart.showNotice(res.data && res.data.message ? res.data.message : 'حدث خطأ، حاول/ي مرة أخرى', 'error');
                     }
                 },
                 error() {
