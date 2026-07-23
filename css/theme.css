@@ -1692,6 +1692,14 @@ body.search-open {
     transition: all var(--ayra-transition);
 }
 
+/* Keep the sticky filter bar just below the header when the banner adds
+   height on top (desktop only — on mobile the bar is not sticky). */
+@media (min-width: 769px) {
+    .ayra-has-banner .ayra-filter-bar {
+        top: calc(60px + var(--ayra-banner-h, 34px));
+    }
+}
+
 /* Mobile-only elements — hidden on desktop */
 .ayra-filter-toggle-btn {
     display: none;
@@ -2698,6 +2706,11 @@ body.search-open {
     top: 90px;
 }
 
+/* Account for the banner height so the summary never tucks under the header */
+.ayra-has-banner .woocommerce-checkout-review-order {
+    top: calc(90px + var(--ayra-banner-h, 34px));
+}
+
 .woocommerce-checkout-review-order-table {
     width: 100%;
     border-collapse: collapse;
@@ -2861,6 +2874,12 @@ body.search-open {
         transform: translateY(0);
         opacity: 1;
         visibility: visible;
+    }
+
+    /* When the banner is showing, the header sits lower — drop the mobile
+       menu below it so it doesn't open on top of the header row. */
+    .ayra-has-banner .ayra-nav {
+        top: calc(70px + var(--ayra-banner-h, 34px));
     }
 
     .ayra-size-grid {
