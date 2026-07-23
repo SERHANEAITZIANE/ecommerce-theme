@@ -19,7 +19,12 @@ function ayra_ajax_add_to_cart()
     }
 
     if (!$variation_id) {
-        wp_send_json_error(['message' => 'يرجى اختيار المقاس أولاً']);
+        // Signal the front-end to scroll up to the size filter instead of
+        // showing a red error toast.
+        wp_send_json_error([
+            'message'   => 'يرجى اختيار المقاس أولاً',
+            'need_size' => true,
+        ]);
     }
 
     // Build variation attributes
