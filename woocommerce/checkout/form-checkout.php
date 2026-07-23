@@ -52,7 +52,7 @@ $cart_total_raw = WC()->cart->get_cart_contents_total();
 
 
         <div class="ayra-co-section" id="ayra-summary-section">
-          <div class="ayra-summary-toggle" id="ayra-summary-toggle">
+          <div class="ayra-summary-toggle open" id="ayra-summary-toggle">
             <div class="ayra-summary-toggle-left">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
               <span>ملخص الطلب</span>
@@ -202,6 +202,8 @@ jQuery(document).ready(function($){
             if(isFreeShipping()){$(this).text('توصيل مجاني ✓').addClass('free');return;}
             $(this).removeClass('free');
             if(!w){$(this).text('');return;}
+            // Special case: Ain Defla (44) home delivery has commune-based pricing
+            if(code===44 && t==='home'){$(this).text('200 - 500 دج');return;}
             var p=(t==='desk')?w.price_desk:w.price_home;
             $(this).text(p>0?p+' دج':'');
         });
@@ -295,12 +297,14 @@ jQuery(document).ready(function($){
     $(document).on('change','input[name="billing_delivery_type"]',function(){
         $('.ayra-dlv-card').removeClass('active');
         $(this).closest('.ayra-dlv-card').addClass('active');
-        reloadWilayas();updatePrice();steps();
+        reloadWilayas();reloadCommunes();updatePrice();steps();
     });
     $(document).on('change','#billing_wilaya',function(){reloadCommunes();updatePrice();steps();});
     // When commune changes in desk mode, populate hidden hub fields
     $(document).on('change','#billing_commune',function(){
         syncHubFields();
+        // Re-trigger checkout update so Ain Defla commune-level pricing recalculates
+        $(document.body).trigger('update_checkout');
     });
 
     // WooCommerce may re-trigger events after update_checkout — re-sync hub fields & button total
@@ -540,7 +544,7 @@ jQuery(document).ready(function($){
 .ayra-chevron { transition: transform 0.3s; color: #9ca3af; }
 .ayra-summary-toggle.open .ayra-chevron { transform: rotate(180deg); }
 .ayra-summary-body {
-    padding: 16px 4px 8px; display: none;
+    padding: 16px 4px 8px; display: block;
 }
 
 /* ─── WC Order Table ─── */

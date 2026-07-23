@@ -33,7 +33,9 @@ defined('ABSPATH') || exit;
 <body <?php body_class(); ?>>
     <?php wp_body_open(); ?>
 
+
     <header class="ayra-header" id="ayra-header">
+        <?php if (function_exists('ayra_render_announcement_banner')) ayra_render_announcement_banner(); ?>
         <div class="ayra-header-inner">
             <!-- Logo -->
             <a href="<?php echo esc_url(home_url('/')); ?>" class="ayra-logo" id="ayra-logo">

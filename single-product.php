@@ -73,28 +73,51 @@ while (have_posts()): the_post();
     </div>
 
     <div class="ayra-product-layout">
-        <!-- Image Gallery -->
+        <!-- Image Carousel (Swipeable) -->
         <div class="ayra-product-gallery" id="ayra-product-gallery">
-            <div class="ayra-gallery-main">
-                <img src="<?php echo esc_url($main_image ?: wc_placeholder_img_src()); ?>" 
-                     alt="<?php echo esc_attr($product->get_name()); ?>"
-                     id="ayra-gallery-main-img"
-                     class="ayra-gallery-main-img">
+            <?php
+            // Collect all images: main + gallery
+            $all_images = [];
+            if ($main_image) {
+                $all_images[] = ['url' => $main_image, 'thumb' => $main_image];
+            }
+            foreach ($gallery_ids as $img_id) {
+                $img_url = wp_get_attachment_image_url($img_id, 'ayra-product-large');
+                $thumb_url = wp_get_attachment_image_url($img_id, 'thumbnail');
+                if ($img_url) {
+                    $all_images[] = ['url' => $img_url, 'thumb' => $thumb_url ?: $img_url];
+                }
+            }
+            $total_slides = count($all_images);
+            ?>
+            <div class="ayra-carousel-wrap">
                 <?php if ($product->is_on_sale()): ?>
                     <span class="ayra-product-badge">تخفيض</span>
                 <?php endif; ?>
+                <div class="ayra-carousel-track" id="ayra-carousel-track">
+                    <?php foreach ($all_images as $i => $img): ?>
+                    <div class="ayra-carousel-slide">
+                        <img src="<?php echo esc_url($img['url']); ?>" 
+                             alt="<?php echo esc_attr($product->get_name()); ?>"
+                             loading="<?php echo $i === 0 ? 'eager' : 'lazy'; ?>">
+                    </div>
+                    <?php endforeach; ?>
+                </div>
+                <?php if ($total_slides > 1): ?>
+                <div class="ayra-carousel-dots" id="ayra-carousel-dots">
+                    <?php for ($i = 0; $i < $total_slides; $i++): ?>
+                    <button class="ayra-carousel-dot<?php echo $i === 0 ? ' active' : ''; ?>" 
+                            data-slide="<?php echo $i; ?>"></button>
+                    <?php endfor; ?>
+                </div>
+                <?php endif; ?>
             </div>
-            <?php if (!empty($gallery_ids)): ?>
-            <div class="ayra-gallery-thumbs">
-                <button class="ayra-gallery-thumb active" data-img="<?php echo esc_url($main_image); ?>">
-                    <img src="<?php echo esc_url($main_image); ?>" alt="">
-                </button>
-                <?php foreach ($gallery_ids as $img_id): 
-                    $img_url = wp_get_attachment_image_url($img_id, 'ayra-product-large');
-                    $thumb_url = wp_get_attachment_image_url($img_id, 'thumbnail');
-                ?>
-                <button class="ayra-gallery-thumb" data-img="<?php echo esc_url($img_url); ?>">
-                    <img src="<?php echo esc_url($thumb_url); ?>" alt="">
+            <?php if ($total_slides > 1): ?>
+            <div class="ayra-carousel-thumbs" id="ayra-carousel-thumbs">
+                <?php foreach ($all_images as $i => $img): ?>
+                <button class="ayra-carousel-thumb<?php echo $i === 0 ? ' active' : ''; ?>" 
+                        data-slide="<?php echo $i; ?>">
+                    <img src="<?php echo esc_url($img['thumb']); ?>" alt="">
                 </button>
                 <?php endforeach; ?>
             </div>
@@ -190,6 +213,11 @@ while (have_posts()): the_post();
             <?php echo wp_kses_post($product->get_description()); ?>
         </div>
     </div>
+    <?php endif; ?>
+
+    <!-- Reviews Section -->
+    <?php if (function_exists('ayra_render_reviews_section')): ?>
+        <?php ayra_render_reviews_section($product->get_id()); ?>
     <?php endif; ?>
 </section>
 

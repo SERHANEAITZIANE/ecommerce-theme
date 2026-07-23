@@ -58,7 +58,7 @@ function ayra_get_delivery_price($wilaya_code, $delivery_type)
             '41' => ['to_home' => 850, 'to_desk' => 450, 'return' => 200],
             '42' => ['to_home' => 750, 'to_desk' => 450, 'return' => 200],
             '43' => ['to_home' => 850, 'to_desk' => 450, 'return' => 200],
-            '44' => ['to_home' => 750, 'to_desk' => 450, 'return' => 200],  // عين الدفلى - Aïn Defla (north)
+            '44' => ['to_home' => 500, 'to_desk' => 450, 'return' => 200],  // عين الدفلى - Aïn Defla (ville=200, autres=500)
             '45' => ['to_home' => 750, 'to_desk' => 450, 'return' => 200],
             '46' => ['to_home' => 800, 'to_desk' => 450, 'return' => 200],  // عين تموشنت - Aïn Témouchent (north)
             '47' => ['to_home' => 1000, 'to_desk' => 600, 'return' => 200],

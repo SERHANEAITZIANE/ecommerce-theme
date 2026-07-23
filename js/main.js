@@ -112,12 +112,39 @@
         init() {
             // From product cards (shop page)
             $(document).on('click', '.ayra-add-to-cart-btn', function (e) {
+                const $btn = $(this);
+                const variationId = $btn.data('variation-id');
+
+                // If no size/variation selected or button is "select-options" ("اختيار المقاس")
+                if ($btn.hasClass('select-options') || !variationId) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const $sizeFilter = $('#ayra-size-filter');
+                    if ($sizeFilter.length) {
+                        const headerOffset = 110;
+                        const elementPosition = $sizeFilter.offset().top;
+                        const offsetPosition = elementPosition - headerOffset;
+                        window.scrollTo({
+                            top: Math.max(0, offsetPosition),
+                            behavior: 'smooth'
+                        });
+                        $sizeFilter.addClass('ayra-pulse-focus');
+                        setTimeout(function () {
+                            $sizeFilter.removeClass('ayra-pulse-focus');
+                        }, 2500);
+                        return;
+                    }
+                    // Fallback to product page if not on shop page
+                    const href = $btn.attr('href');
+                    if (href) window.location.href = href;
+                    return;
+                }
+
                 e.preventDefault();
                 e.stopPropagation();
-                const $btn = $(this);
                 AddToCart.add($btn, {
                     product_id: $btn.data('product-id'),
-                    variation_id: $btn.data('variation-id'),
+                    variation_id: variationId,
                     size: $btn.data('size'),
                     quantity: 1,
                 });
@@ -131,7 +158,20 @@
                 const $sizeOptions = $('.ayra-size-option');
 
                 if ($sizeOptions.length > 0 && !$selected.length) {
-                    AddToCart.showNotice('يرجى اختيار المقاس أولاً', 'error');
+                    const $selector = $('.ayra-size-selector');
+                    if ($selector.length) {
+                        const headerOffset = 120;
+                        const elementPosition = $selector.offset().top;
+                        const offsetPosition = elementPosition - headerOffset;
+                        window.scrollTo({
+                            top: Math.max(0, offsetPosition),
+                            behavior: 'smooth'
+                        });
+                        $selector.addClass('ayra-pulse-focus');
+                        setTimeout(function () {
+                            $selector.removeClass('ayra-pulse-focus');
+                        }, 2500);
+                    }
                     return;
                 }
 
@@ -243,13 +283,42 @@
                 if (val > 1) $input.val(val - 1);
             });
 
-            // Gallery thumbnails
-            $('.ayra-gallery-thumb').on('click', function () {
-                const imgUrl = $(this).data('img');
-                $('#ayra-gallery-main-img').attr('src', imgUrl);
-                $('.ayra-gallery-thumb').removeClass('active');
-                $(this).addClass('active');
-            });
+            // ─── Image Carousel (Swipeable) ───────────────
+            const $track = $('#ayra-carousel-track');
+            if ($track.length) {
+                const $dots = $('.ayra-carousel-dot');
+                const $thumbs = $('.ayra-carousel-thumb');
+                let scrollTimeout;
+
+                // Scroll → update active dot + thumb
+                $track.on('scroll', function () {
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = setTimeout(() => {
+                        const scrollLeft = $track.scrollLeft();
+                        const slideWidth = $track[0].clientWidth;
+                        const idx = Math.round(scrollLeft / slideWidth);
+                        $dots.removeClass('active').eq(idx).addClass('active');
+                        $thumbs.removeClass('active').eq(idx).addClass('active');
+                        // Scroll thumb into view
+                        const $activeThumb = $thumbs.eq(idx);
+                        if ($activeThumb.length) {
+                            $activeThumb[0].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                        }
+                    }, 50);
+                });
+
+                // Dot click → scroll to slide
+                $dots.on('click', function () {
+                    const idx = $(this).data('slide');
+                    $track[0].scrollTo({ left: idx * $track[0].clientWidth, behavior: 'smooth' });
+                });
+
+                // Thumb click → scroll to slide
+                $thumbs.on('click', function () {
+                    const idx = $(this).data('slide');
+                    $track[0].scrollTo({ left: idx * $track[0].clientWidth, behavior: 'smooth' });
+                });
+            }
 
             // WhatsApp order button
             $('#ayra-whatsapp-order').on('click', function (e) {
@@ -273,6 +342,304 @@
             if ($preselected.length) {
                 $preselected.trigger('click');
             }
+        }
+    };
+
+    // ─── Reviews System ─────────────────────────────────
+    const Reviews = {
+        mediaRecorder: null,
+        audioChunks: [],
+        audioBlob: null,
+        imageFiles: [],
+        timerInterval: null,
+        recordStartTime: 0,
+
+        init() {
+            if (!$('#ayra-reviews').length) return;
+
+            // Star rating input
+            $('#ayra-star-input button').on('click', function () {
+                const rating = $(this).data('rating');
+                $('#ayra-review-rating').val(rating);
+                $('#ayra-star-input button').each(function () {
+                    $(this).toggleClass('active', $(this).data('rating') <= rating);
+                });
+            });
+
+            // Voice recording
+            $('#ayra-record-btn').on('click', () => this.toggleRecording());
+            $('#ayra-record-remove').on('click', () => this.removeRecording());
+
+            // Image upload
+            $('#ayra-add-images-btn').on('click', () => $('#ayra-review-images-file').trigger('click'));
+            $('#ayra-review-images-file').on('change', (e) => this.handleImageSelect(e));
+            $(document).on('click', '.ayra-img-preview-remove', function () {
+                const idx = $(this).data('idx');
+                Reviews.removeImage(idx);
+            });
+
+            // Submit review
+            $('#ayra-submit-review').on('click', () => this.submitReview());
+
+            // Load more
+            $('#ayra-load-more-reviews').on('click', function () {
+                Reviews.loadMore($(this));
+            });
+
+            // Click to enlarge review screenshots (Lightbox Modal)
+            $(document).on('click', '.ayra-review-img-thumb img, .ayra-review-images-gallery img', function () {
+                const imgSrc = $(this).attr('src');
+                if (!imgSrc) return;
+
+                let $modal = $('#ayra-image-lightbox-modal');
+                if (!$modal.length) {
+                    $modal = $(`
+                        <div id="ayra-image-lightbox-modal" class="ayra-lightbox-overlay">
+                            <div class="ayra-lightbox-content">
+                                <button type="button" class="ayra-lightbox-close">&times;</button>
+                                <img src="" alt="صورة المراجعة مكبرة" class="ayra-lightbox-img">
+                            </div>
+                        </div>
+                    `);
+                    $('body').append($modal);
+                    $modal.on('click', function (e) {
+                        if ($(e.target).hasClass('ayra-lightbox-overlay') || $(e.target).hasClass('ayra-lightbox-close')) {
+                            $modal.removeClass('open');
+                        }
+                    });
+                }
+                $modal.find('.ayra-lightbox-img').attr('src', imgSrc);
+                $modal.addClass('open');
+            });
+        },
+
+        handleImageSelect(e) {
+            const files = Array.from(e.target.files);
+            const remaining = 5 - this.imageFiles.length;
+            const toAdd = files.slice(0, remaining);
+            toAdd.forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                if (file.size > 5 * 1024 * 1024) return;
+                this.imageFiles.push(file);
+            });
+            this.renderImagePreviews();
+            // Reset file input so same file can be selected again
+            e.target.value = '';
+        },
+
+        removeImage(idx) {
+            this.imageFiles.splice(idx, 1);
+            this.renderImagePreviews();
+        },
+
+        renderImagePreviews() {
+            const $container = $('#ayra-image-previews');
+            $container.empty();
+            this.imageFiles.forEach((file, idx) => {
+                const url = URL.createObjectURL(file);
+                $container.append(
+                    `<div class="ayra-img-preview-item">
+                        <img src="${url}" alt="">
+                        <button type="button" class="ayra-img-preview-remove" data-idx="${idx}">✕</button>
+                    </div>`
+                );
+            });
+            // Show/hide add button based on count
+            if (this.imageFiles.length >= 5) {
+                $('#ayra-add-images-btn').hide();
+            } else {
+                $('#ayra-add-images-btn').show();
+            }
+        },
+
+        toggleRecording() {
+            if (this.mediaRecorder && this.mediaRecorder.state === 'recording') {
+                this.stopRecording();
+            } else {
+                this.startRecording();
+            }
+        },
+
+        async startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                this.audioChunks = [];
+                this.mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+
+                this.mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) this.audioChunks.push(e.data);
+                };
+
+                this.mediaRecorder.onstop = () => {
+                    this.audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' });
+                    const url = URL.createObjectURL(this.audioBlob);
+                    $('#ayra-record-audio').attr('src', url);
+                    $('#ayra-record-preview').show();
+                    stream.getTracks().forEach(t => t.stop());
+                };
+
+                this.mediaRecorder.start();
+                $('#ayra-record-btn').addClass('recording').find('span').text('إيقاف');
+                $('#ayra-record-timer').show();
+                this.recordStartTime = Date.now();
+                this.timerInterval = setInterval(() => {
+                    const elapsed = Math.floor((Date.now() - this.recordStartTime) / 1000);
+                    const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+                    const s = String(elapsed % 60).padStart(2, '0');
+                    $('#ayra-record-timer').text(`${m}:${s}`);
+                }, 500);
+            } catch (err) {
+                alert('لم نتمكن من الوصول للميكروفون. يرجى السماح بالوصول.');
+            }
+        },
+
+        stopRecording() {
+            if (this.mediaRecorder) this.mediaRecorder.stop();
+            clearInterval(this.timerInterval);
+            $('#ayra-record-btn').removeClass('recording').find('span').text('تسجيل');
+            $('#ayra-record-timer').hide();
+        },
+
+        removeRecording() {
+            this.audioBlob = null;
+            this.audioChunks = [];
+            $('#ayra-record-preview').hide();
+            $('#ayra-record-audio').attr('src', '');
+        },
+
+        submitReview() {
+            const name = $('#ayra-review-name').val().trim();
+            const text = $('#ayra-review-text').val().trim();
+            const rating = $('#ayra-review-rating').val();
+            const productId = $('#ayra-reviews').data('product-id');
+
+            if (!name) { alert('يرجى إدخال اسمك'); return; }
+
+            const formData = new FormData();
+            formData.append('action', 'ayra_submit_review');
+            formData.append('author_name', name);
+            formData.append('review_text', text);
+            formData.append('rating', rating);
+            formData.append('product_id', productId);
+            if (this.audioBlob) {
+                formData.append('audio', this.audioBlob, 'review.webm');
+            }
+            // Append image files
+            this.imageFiles.forEach(file => {
+                formData.append('review_images[]', file);
+            });
+
+            const $btn = $('#ayra-submit-review');
+            $btn.prop('disabled', true).text('جاري الإرسال...');
+
+            $.ajax({
+                url: ayra_ajax.url,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: (res) => {
+                    if (res.success) {
+                        // Add new review to list
+                        const r = res.data.review;
+                        const initial = r.author.charAt(0);
+                        let starsHtml = '';
+                        for (let i = 1; i <= 5; i++) {
+                            starsHtml += `<svg viewBox="0 0 24 24" class="${i > r.rating ? 'empty' : ''}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+                        }
+                        let audioHtml = '';
+                        if (r.audio_url) {
+                            audioHtml = `<div class="ayra-review-audio">
+                                <div class="ayra-review-audio-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> تسجيل صوتي</div>
+                                <audio controls src="${r.audio_url}"></audio>
+                            </div>`;
+                        }
+                        let imagesHtml = '';
+                        if (r.image_urls && r.image_urls.length) {
+                            imagesHtml = '<div class="ayra-review-images-gallery">';
+                            r.image_urls.forEach(url => {
+                                imagesHtml += `<div class="ayra-review-img-thumb"><img src="${url}" alt="صورة المراجعة"></div>`;
+                            });
+                            imagesHtml += '</div>';
+                        }
+                        const html = `<div class="ayra-review-card" style="animation:fadeIn 0.4s">
+                            <div class="ayra-review-card-header">
+                                <div class="ayra-review-card-author">
+                                    <div class="ayra-review-avatar">${initial}</div>
+                                    <div><div class="ayra-review-name">${r.author}</div><div class="ayra-review-date">${r.date}</div></div>
+                                </div>
+                                <div class="ayra-review-stars">${starsHtml}</div>
+                            </div>
+                            ${r.text ? `<div class="ayra-review-card-body">${r.text}</div>` : ''}
+                            ${imagesHtml}
+                            ${audioHtml}
+                        </div>`;
+                        $('.ayra-no-reviews').remove();
+                        $('#ayra-reviews-list').prepend(html);
+
+                        // Reset form
+                        $('#ayra-review-name').val('');
+                        $('#ayra-review-text').val('');
+                        this.removeRecording();
+                        this.imageFiles = [];
+                        this.renderImagePreviews();
+                        AddToCart.showNotice(res.data.message, 'success');
+                    } else {
+                        alert(res.data.message || 'حدث خطأ');
+                    }
+                },
+                error: () => alert('حدث خطأ في الاتصال'),
+                complete: () => $btn.prop('disabled', false).html('<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> إرسال الرأي'),
+            });
+        },
+
+        loadMore($btn) {
+            const page = $btn.data('page');
+            const productId = $('#ayra-reviews').data('product-id');
+            $btn.text('جاري التحميل...');
+
+            $.post(ayra_ajax.url, {
+                action: 'ayra_get_reviews',
+                product_id: productId,
+                page: page,
+            }, function (res) {
+                if (res.success && res.data.reviews.length) {
+                    res.data.reviews.forEach(function (r) {
+                        const initial = r.author.charAt(0);
+                        let starsHtml = '';
+                        for (let i = 1; i <= 5; i++) {
+                            starsHtml += `<svg viewBox="0 0 24 24" class="${i > r.rating ? 'empty' : ''}"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+                        }
+                        let audioHtml = r.audio_url ? `<div class="ayra-review-audio"><div class="ayra-review-audio-label"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg> تسجيل صوتي</div><audio controls src="${r.audio_url}"></audio></div>` : '';
+                        let imagesHtml = '';
+                        if (r.image_urls && r.image_urls.length) {
+                            imagesHtml = '<div class="ayra-review-images-gallery">';
+                            r.image_urls.forEach(function(url) {
+                                imagesHtml += '<div class="ayra-review-img-thumb"><img src="' + url + '" alt="صورة المراجعة"></div>';
+                            });
+                            imagesHtml += '</div>';
+                        }
+                        const html = `<div class="ayra-review-card">
+                            <div class="ayra-review-card-header">
+                                <div class="ayra-review-card-author"><div class="ayra-review-avatar">${initial}</div><div><div class="ayra-review-name">${r.author}</div><div class="ayra-review-date">${r.date}</div></div></div>
+                                <div class="ayra-review-stars">${starsHtml}</div>
+                            </div>
+                            ${r.text ? `<div class="ayra-review-card-body">${r.text}</div>` : ''}
+                            ${imagesHtml}
+                            ${audioHtml}
+                        </div>`;
+                        $('#ayra-reviews-list').append(html);
+                    });
+
+                    if (res.data.has_more) {
+                        $btn.data('page', page + 1).text('عرض المزيد من الآراء');
+                    } else {
+                        $btn.remove();
+                    }
+                } else {
+                    $btn.remove();
+                }
+            });
         }
     };
 
@@ -604,6 +971,94 @@
         }
     };
 
+    // ─── Sub-category Size Picker Modal ──────────────────
+    const SubcatSizePicker = {
+        pendingUrl: '',
+
+        init() {
+            const $overlay = $('#ayra-sizepick-overlay');
+            if (!$overlay.length) return;
+
+            // Focus client on size selection when visiting shop without a specific size selected
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasSize = urlParams.has('filter_size') && urlParams.get('filter_size');
+            const isShopPage = $('#ayra-shop').length > 0;
+            if (isShopPage && !hasSize) {
+                const $sizeFilter = $('#ayra-size-filter');
+                if ($sizeFilter.length) {
+                    setTimeout(function() {
+                        const headerOffset = 110;
+                        const elementPosition = $sizeFilter.offset().top;
+                        const offsetPosition = elementPosition - headerOffset;
+                        window.scrollTo({
+                            top: Math.max(0, offsetPosition),
+                            behavior: 'smooth'
+                        });
+                        $sizeFilter.addClass('ayra-pulse-focus');
+                        setTimeout(function() {
+                            $sizeFilter.removeClass('ayra-pulse-focus');
+                        }, 2500);
+                    }, 300);
+                }
+            }
+
+            // Intercept sub-category pill clicks that have the data attribute
+            $(document).on('click', 'a[data-subcat-sizepick]', function (e) {
+                e.preventDefault();
+                const baseUrl = $(this).attr('href');
+                const subcatName = $(this).data('subcat-name');
+                SubcatSizePicker.pendingUrl = baseUrl;
+
+                // Update modal title
+                $('#ayra-sizepick-title').text('اختاري المقاس — ' + subcatName);
+
+                // Set skip link to navigate without size
+                $('#ayra-sizepick-skip').attr('href', baseUrl);
+
+                // Open modal
+                $overlay.addClass('open');
+                $('body').css('overflow', 'hidden');
+            });
+
+            // Size button click — navigate with size
+            $(document).on('click', '.ayra-sizepick-btn', function () {
+                const size = $(this).data('size');
+                let url = SubcatSizePicker.pendingUrl;
+                // Add filter_size parameter
+                if (url.indexOf('?') !== -1) {
+                    url += '&filter_size=' + encodeURIComponent(size);
+                } else {
+                    url += '?filter_size=' + encodeURIComponent(size);
+                }
+                window.location.href = url;
+            });
+
+            // Skip link — navigate without size
+            $(document).on('click', '#ayra-sizepick-skip', function (e) {
+                // href is already set, let default navigation happen
+                SubcatSizePicker.close();
+            });
+
+            // Close modal
+            $('#ayra-sizepick-close').on('click', function () {
+                SubcatSizePicker.close();
+            });
+            $overlay.on('click', function (e) {
+                if (e.target === this) SubcatSizePicker.close();
+            });
+            $(document).on('keydown', function (e) {
+                if (e.key === 'Escape' && $overlay.hasClass('open')) {
+                    SubcatSizePicker.close();
+                }
+            });
+        },
+
+        close() {
+            $('#ayra-sizepick-overlay').removeClass('open');
+            $('body').css('overflow', '');
+        }
+    };
+
     // ─── Initialize All ─────────────────────────────────
     $(document).ready(function () {
         CartDrawer.init();
@@ -616,6 +1071,8 @@
         Search.init();
         HeroSearch.init();
         HeroCategories.init();
+        Reviews.init();
+        SubcatSizePicker.init();
     });
 
 })(jQuery);

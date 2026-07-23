@@ -87,6 +87,8 @@ require_once AYRA_DIR . '/inc/zr-express-settings.php';
 require_once AYRA_DIR . '/inc/zr-data/zr-checkout-data.php'; // ZR JSON data provider
 require_once AYRA_DIR . '/inc/google-sheets-sync.php';       // Google Sheets order sync
 require_once AYRA_DIR . '/inc/random-daily-sort.php';        // Daily random product sorting
+require_once AYRA_DIR . '/inc/announcement-banner.php';       // Scrolling announcement banner
+require_once AYRA_DIR . '/inc/reviews-system.php';            // Voice & text reviews
 
 // ─── Cart Fragments for AJAX cart update ─────────────────
 function ayra_cart_count_fragment($fragments)

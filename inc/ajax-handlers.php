@@ -14,8 +14,12 @@ function ayra_ajax_add_to_cart()
     $quantity = intval($_POST['quantity'] ?? 1);
     $size = sanitize_text_field($_POST['size'] ?? '');
 
-    if (!$product_id || !$variation_id) {
-        wp_send_json_error(['message' => 'بيانات غير صحيحة']);
+    if (!$product_id) {
+        wp_send_json_error(['message' => 'حدث خطأ، حاولي مرة أخرى']);
+    }
+
+    if (!$variation_id) {
+        wp_send_json_error(['message' => 'يرجى اختيار المقاس أولاً']);
     }
 
     // Build variation attributes

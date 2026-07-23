@@ -103,49 +103,6 @@ $size_numbers = [
                 </div>
             </div>
 
-            <!-- Shop by category / packs -->
-            <?php
-            $top_cats = get_terms([
-                'taxonomy'   => 'product_cat',
-                'hide_empty' => true,
-                'parent'     => 0,
-            ]);
-            if (!empty($top_cats) && !is_wp_error($top_cats)):
-            ?>
-            <div class="ayra-hero-cats" id="ayra-hero-cats">
-                <p class="ayra-hero-cats-title">أو تسوقي حسب الفئة</p>
-                <div class="ayra-hero-cats-grid">
-                    <?php foreach ($top_cats as $cat):
-                        $children = get_terms([
-                            'taxonomy'   => 'product_cat',
-                            'hide_empty' => true,
-                            'parent'     => $cat->term_id,
-                        ]);
-                        $has_children = !empty($children) && !is_wp_error($children);
-                        $cat_url = add_query_arg('product_cat', $cat->slug, $archive_url);
-                    ?>
-                    <div class="ayra-hero-cat <?php echo $has_children ? 'has-children' : ''; ?>">
-                        <?php if ($has_children): ?>
-                        <button type="button" class="ayra-hero-cat-btn" data-cat="<?php echo esc_attr($cat->slug); ?>">
-                            <?php echo esc_html($cat->name); ?>
-                            <svg class="ayra-hero-cat-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-                        </button>
-                        <div class="ayra-hero-subcats">
-                            <a href="<?php echo esc_url($cat_url); ?>" class="ayra-hero-subcat">كل <?php echo esc_html($cat->name); ?></a>
-                            <?php foreach ($children as $child): ?>
-                            <a href="<?php echo esc_url(add_query_arg('product_cat', $child->slug, $archive_url)); ?>" class="ayra-hero-subcat">
-                                <?php echo esc_html($child->name); ?>
-                            </a>
-                            <?php endforeach; ?>
-                        </div>
-                        <?php else: ?>
-                        <a href="<?php echo esc_url($cat_url); ?>" class="ayra-hero-cat-btn"><?php echo esc_html($cat->name); ?></a>
-                        <?php endif; ?>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-            <?php endif; ?>
 
             <!-- WhatsApp Exchange & Inquiry Action Buttons -->
             <div class="ayra-hero-whatsapp-actions">
@@ -163,5 +120,57 @@ $size_numbers = [
     </div>
 </section>
 
+<!-- Contact Section -->
+<section class="ayra-contact-section" id="ayra-contact">
+    <div class="ayra-contact-inner">
+        <div class="ayra-contact-info">
+            <h2>تواصلي معنا</h2>
+            <p class="ayra-contact-subtitle">نحن هنا لمساعدتك في أي استفسار</p>
+            
+            <div class="ayra-contact-cards">
+                <a href="https://wa.me/213563537757" target="_blank" class="ayra-contact-card">
+                    <div class="ayra-contact-card-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </div>
+                    <div class="ayra-contact-card-text">
+                        <span class="ayra-contact-card-label">الهاتف / واتساب</span>
+                        <span class="ayra-contact-card-value">0563 53 77 57</span>
+                    </div>
+                </a>
+
+                <a href="https://wa.me/213563537757?text=<?php echo urlencode('السلام عليكم، أريد استفسار'); ?>" target="_blank" class="ayra-contact-card">
+                    <div class="ayra-contact-card-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <div class="ayra-contact-card-text">
+                        <span class="ayra-contact-card-label">استفسار</span>
+                        <span class="ayra-contact-card-value">راسلينا على واتساب</span>
+                    </div>
+                </a>
+
+                <div class="ayra-contact-card">
+                    <div class="ayra-contact-card-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div class="ayra-contact-card-text">
+                        <span class="ayra-contact-card-label">العنوان</span>
+                        <span class="ayra-contact-card-value" style="direction:rtl;">عين الدفلى، الجزائر</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ayra-contact-map">
+            <iframe 
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3217.1!2d1.9579499!3d36.2614667!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1285b7d97099b155%3A0x296f242fa03fb685!2sBoutique%20ayra!5e0!3m2!1sfr!2sdz!4v1700000000000!5m2!1sfr!2sdz"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+        </div>
+    </div>
+</section>
+
 
 <?php get_footer(); ?>
+

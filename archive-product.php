@@ -251,14 +251,15 @@ usort($all_sizes, function($a, $b) use ($size_order) {
                        class="ayra-filter-pill <?php echo ($selected_cat === $active_top_term->slug) ? 'active' : ''; ?>">
                         <span class="ayra-pill-text">الكل</span>
                     </a>
-                    <?php foreach ($sub_categories as $sub):
+                <?php foreach ($sub_categories as $sub):
                         $sub_url = add_query_arg('product_cat', $sub->slug, $shop_page_url);
                         if ($selected_size) $sub_url = add_query_arg('filter_size', $selected_size, $sub_url);
                         $sub_count = isset($cat_counts[$sub->slug]) ? $cat_counts[$sub->slug] : 0;
                         $is_sub_active = ($selected_cat === $sub->slug);
                     ?>
                     <a href="<?php echo esc_url($sub_url); ?>"
-                       class="ayra-filter-pill <?php echo $is_sub_active ? 'active' : ''; ?> <?php echo ($sub_count <= 0 && !$is_sub_active) ? 'disabled' : ''; ?>">
+                       class="ayra-filter-pill <?php echo $is_sub_active ? 'active' : ''; ?> <?php echo ($sub_count <= 0 && !$is_sub_active) ? 'disabled' : ''; ?>"
+                       <?php if (!$selected_size): ?>data-subcat-sizepick="1" data-subcat-slug="<?php echo esc_attr($sub->slug); ?>" data-subcat-name="<?php echo esc_attr($sub->name); ?>"<?php endif; ?>>
                         <span class="ayra-pill-text"><?php echo esc_html($sub->name); ?></span>
                         <span class="ayra-pill-count"><?php echo $sub_count; ?></span>
                     </a>
@@ -373,6 +374,9 @@ usort($all_sizes, function($a, $b) use ($size_order) {
                         $total_product_stock += $stock_qty;
                     }
                 }
+                
+                // Skip products where ALL sizes are out of stock
+                if ($total_product_stock <= 0) continue;
                 
                 // Determine stock status display
                 $stock_status = 'instock';
@@ -499,5 +503,35 @@ usort($all_sizes, function($a, $b) use ($size_order) {
         <?php endif; ?>
     </div>
 </section>
+
+<!-- Size Picker Modal (for sub-category clicks without a size selected) -->
+<div class="ayra-sizepick-overlay" id="ayra-sizepick-overlay">
+    <div class="ayra-sizepick-modal" id="ayra-sizepick-modal">
+        <div class="ayra-sizepick-header">
+            <h3 id="ayra-sizepick-title">اختاري المقاس</h3>
+            <button class="ayra-sizepick-close" id="ayra-sizepick-close">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+        <p class="ayra-sizepick-subtitle">اختاري مقاسك لتصفية المنتجات</p>
+        <div class="ayra-sizepick-sizes" id="ayra-sizepick-sizes">
+            <?php 
+            $global_sizes = array_keys(ayra_get_size_stock_map_cached());
+            usort($global_sizes, function($a, $b) use ($size_order) {
+                $weight_a = isset($size_order[strtoupper($a)]) ? $size_order[strtoupper($a)] : 99;
+                $weight_b = isset($size_order[strtoupper($b)]) ? $size_order[strtoupper($b)] : 99;
+                return $weight_a === $weight_b ? strcmp($a, $b) : $weight_a - $weight_b;
+            });
+            foreach ($global_sizes as $sz): ?>
+            <button class="ayra-sizepick-btn" data-size="<?php echo esc_attr(strtolower($sz)); ?>">
+                <?php echo esc_html($sz); ?>
+            </button>
+            <?php endforeach; ?>
+        </div>
+        <a href="#" class="ayra-sizepick-skip" id="ayra-sizepick-skip">تصفح بدون مقاس ←</a>
+    </div>
+</div>
 
 <?php get_footer(); ?>

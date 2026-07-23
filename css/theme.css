@@ -82,6 +82,132 @@ button {
     font-size: inherit;
 }
 
+/* ─── Announcement Banner (mobile overrides — main rules in Feature 6 section) ─── */
+@media (max-width: 768px) {
+    .ayra-announcement-banner {
+        height: 32px;
+        font-size: 12px;
+    }
+}
+
+/* ─── Size Picker Modal ─────────────────────────────── */
+.ayra-sizepick-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.ayra-sizepick-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ayra-sizepick-modal {
+    background: #fff;
+    border-radius: var(--ayra-radius-lg);
+    padding: 32px;
+    max-width: 420px;
+    width: 90%;
+    box-shadow: var(--ayra-shadow-xl);
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s ease;
+    text-align: center;
+}
+
+.ayra-sizepick-overlay.open .ayra-sizepick-modal {
+    transform: translateY(0) scale(1);
+}
+
+.ayra-sizepick-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.ayra-sizepick-header h3 {
+    font-family: var(--ayra-font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ayra-primary);
+}
+
+.ayra-sizepick-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ayra-text-muted);
+    transition: all 0.2s;
+}
+
+.ayra-sizepick-close:hover {
+    background: var(--ayra-bg-warm);
+    color: var(--ayra-text);
+}
+
+.ayra-sizepick-subtitle {
+    font-size: 14px;
+    color: var(--ayra-text-muted);
+    margin-bottom: 20px;
+}
+
+.ayra-sizepick-sizes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.ayra-sizepick-btn {
+    min-width: 56px;
+    height: 48px;
+    padding: 0 16px;
+    border-radius: var(--ayra-radius-md);
+    border: 2px solid var(--ayra-border);
+    background: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ayra-text);
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+.ayra-sizepick-btn:hover {
+    border-color: var(--ayra-secondary);
+    background: var(--ayra-bg-warm);
+    transform: translateY(-2px);
+    box-shadow: var(--ayra-shadow-md);
+}
+
+.ayra-sizepick-btn:active {
+    transform: translateY(0);
+}
+
+.ayra-sizepick-skip {
+    display: inline-block;
+    font-size: 13px;
+    color: var(--ayra-text-muted);
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.ayra-sizepick-skip:hover {
+    color: var(--ayra-secondary-dark);
+}
+
 /* ─── Header ─────────────────────────────────────────── */
 .ayra-header {
     position: fixed;
@@ -3177,4 +3303,648 @@ body.search-open {
 .ayra-hero-subcat:hover {
     background: #C9A87C;
     color: #fff;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Feature 6 — Announcement Banner (Scrolling Marquee)
+   ═══════════════════════════════════════════════════════════ */
+.ayra-announcement-banner {
+    width: 100%;
+    overflow: hidden;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    z-index: 999;
+    position: sticky;
+    top: 70px;
+}
+.ayra-banner-track {
+    display: inline-flex;
+    animation: ayra-marquee 30s linear infinite;
+}
+.ayra-banner-content {
+    display: inline-block;
+    padding: 8px 0;
+}
+@keyframes ayra-marquee {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+/* Slow down on hover */
+.ayra-announcement-banner:hover .ayra-banner-track {
+    animation-play-state: paused;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Feature 3 — Product Image Carousel (Swipeable)
+   ═══════════════════════════════════════════════════════════ */
+.ayra-carousel-wrap {
+    position: relative;
+    overflow: hidden;
+    border-radius: 16px;
+    background: #f5f0eb;
+}
+.ayra-carousel-track {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
+.ayra-carousel-track::-webkit-scrollbar { display: none; }
+.ayra-carousel-slide {
+    flex: 0 0 100%;
+    scroll-snap-align: center;
+    position: relative;
+}
+.ayra-carousel-slide img {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    aspect-ratio: 4/5;
+}
+.ayra-carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 0;
+}
+.ayra-carousel-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    border: none;
+    background: #d1d5db;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s;
+}
+.ayra-carousel-dot.active {
+    background: var(--ayra-secondary, #C9A87C);
+    width: 24px;
+    border-radius: 4px;
+}
+/* Sale badge on carousel */
+.ayra-carousel-wrap .ayra-product-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    background: #ef4444;
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+/* Thumbnails row below carousel */
+.ayra-carousel-thumbs {
+    display: flex;
+    gap: 8px;
+    padding: 8px 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.ayra-carousel-thumbs::-webkit-scrollbar { display: none; }
+.ayra-carousel-thumb {
+    flex: 0 0 60px;
+    height: 75px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: border-color 0.2s, opacity 0.2s;
+    opacity: 0.6;
+    background: none;
+    padding: 0;
+}
+.ayra-carousel-thumb.active {
+    border-color: var(--ayra-secondary, #C9A87C);
+    opacity: 1;
+}
+.ayra-carousel-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Feature 4 — Contact Section (Homepage Bottom)
+   ═══════════════════════════════════════════════════════════ */
+.ayra-contact-section {
+    background: linear-gradient(160deg, #1f2937 0%, #111827 100%);
+    padding: 60px 20px;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+}
+.ayra-contact-section::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201,168,124,0.15) 0%, transparent 70%);
+    pointer-events: none;
+}
+.ayra-contact-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+}
+.ayra-contact-info h2 {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0 0 8px;
+    color: #fff;
+}
+.ayra-contact-info .ayra-contact-subtitle {
+    font-size: 15px;
+    color: rgba(255,255,255,0.6);
+    margin: 0 0 28px;
+}
+.ayra-contact-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.ayra-contact-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition: all 0.3s;
+    text-decoration: none;
+    color: #fff;
+}
+.ayra-contact-card:hover {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(201,168,124,0.4);
+    transform: translateY(-2px);
+}
+.ayra-contact-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--ayra-secondary, #C9A87C), var(--ayra-secondary-dark, #B08D5B));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.ayra-contact-card-icon svg {
+    color: #fff;
+}
+.ayra-contact-card-text {
+    display: flex;
+    flex-direction: column;
+}
+.ayra-contact-card-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.ayra-contact-card-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 2px;
+    direction: ltr;
+}
+.ayra-contact-map {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,255,255,0.1);
+}
+.ayra-contact-map iframe {
+    width: 100%;
+    height: 320px;
+    border: none;
+    display: block;
+}
+@media (max-width: 768px) {
+    .ayra-contact-inner {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    .ayra-contact-section { padding: 40px 16px; }
+    .ayra-contact-info h2 { font-size: 24px; }
+    .ayra-contact-map iframe { height: 250px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Feature 5 — Reviews System
+   ═══════════════════════════════════════════════════════════ */
+.ayra-reviews-section {
+    margin-top: 40px;
+    padding: 32px 0;
+    border-top: 2px solid var(--ayra-border, #E8E4DF);
+}
+.ayra-reviews-section h3 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--ayra-text, #1A1A1A);
+    margin: 0 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.ayra-reviews-section h3 svg { color: var(--ayra-secondary, #C9A87C); }
+/* Review Form */
+.ayra-review-form {
+    background: var(--ayra-bg-warm, #F5F0EB);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 32px;
+}
+.ayra-review-form h4 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 16px;
+    color: var(--ayra-text, #1A1A1A);
+}
+.ayra-review-field {
+    margin-bottom: 14px;
+}
+.ayra-review-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ayra-text-light, #6B6B6B);
+    margin-bottom: 6px;
+}
+.ayra-review-field input[type="text"],
+.ayra-review-field textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid var(--ayra-border, #E8E4DF);
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+.ayra-review-field input:focus,
+.ayra-review-field textarea:focus {
+    border-color: var(--ayra-secondary, #C9A87C);
+    box-shadow: 0 0 0 3px rgba(201,168,124,0.15);
+}
+.ayra-review-field textarea { min-height: 80px; resize: vertical; }
+/* Star Rating Input */
+.ayra-star-rating-input {
+    display: flex;
+    gap: 4px;
+    direction: ltr;
+}
+.ayra-star-rating-input button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    color: #d1d5db;
+    transition: color 0.15s, transform 0.15s;
+    font-size: 0;
+}
+.ayra-star-rating-input button:hover { transform: scale(1.2); }
+.ayra-star-rating-input button.active { color: #f59e0b; }
+.ayra-star-rating-input button svg { fill: currentColor; }
+/* Voice Recording */
+.ayra-voice-record {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+.ayra-record-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 2px solid #ef4444;
+    background: #fef2f2;
+    color: #ef4444;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+.ayra-record-btn:hover { background: #fee2e2; }
+.ayra-record-btn.recording {
+    background: #ef4444;
+    color: #fff;
+    animation: ayra-pulse-rec 1.5s infinite;
+}
+@keyframes ayra-pulse-rec {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+}
+.ayra-record-timer {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ef4444;
+    font-variant-numeric: tabular-nums;
+}
+.ayra-record-preview {
+    width: 100%;
+    margin-top: 8px;
+}
+.ayra-record-preview audio {
+    width: 100%;
+    border-radius: 8px;
+    height: 36px;
+}
+.ayra-record-remove {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 8px;
+}
+.ayra-submit-review-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    border-radius: 14px;
+    border: none;
+    background: linear-gradient(135deg, var(--ayra-secondary, #C9A87C), var(--ayra-secondary-dark, #B08D5B));
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    box-shadow: 0 4px 16px rgba(201,168,124,0.3);
+}
+.ayra-submit-review-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(201,168,124,0.4); }
+.ayra-submit-review-btn:disabled { opacity: 0.6; pointer-events: none; }
+/* Review Cards */
+.ayra-reviews-list { display: flex; flex-direction: column; gap: 16px; }
+.ayra-review-card {
+    background: #fff;
+    border: 1px solid var(--ayra-border-light, #F0ECE7);
+    border-radius: 16px;
+    padding: 20px;
+    transition: box-shadow 0.2s;
+}
+.ayra-review-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+.ayra-review-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.ayra-review-card-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.ayra-review-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ayra-secondary, #C9A87C), var(--ayra-secondary-dark, #B08D5B));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+.ayra-review-name { font-size: 15px; font-weight: 700; color: var(--ayra-text, #1A1A1A); }
+.ayra-review-date { font-size: 12px; color: var(--ayra-text-muted, #9B9B9B); }
+.ayra-review-stars {
+    display: flex;
+    gap: 2px;
+    direction: ltr;
+}
+.ayra-review-stars svg { fill: #f59e0b; width: 16px; height: 16px; }
+.ayra-review-stars svg.empty { fill: #d1d5db; }
+.ayra-review-card-body { font-size: 14px; line-height: 1.7; color: var(--ayra-text-light, #6B6B6B); margin-bottom: 8px; }
+.ayra-review-audio {
+    margin-top: 10px;
+}
+.ayra-review-audio audio {
+    width: 100%;
+    height: 36px;
+    border-radius: 8px;
+}
+.ayra-review-audio-label {
+    font-size: 12px;
+    color: var(--ayra-text-muted, #9B9B9B);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+/* Load More */
+.ayra-reviews-load-more {
+    text-align: center;
+    margin-top: 20px;
+}
+.ayra-load-more-btn {
+    padding: 12px 32px;
+    border-radius: 14px;
+    border: 2px solid var(--ayra-border, #E8E4DF);
+    background: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--ayra-text, #1A1A1A);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+.ayra-load-more-btn:hover { border-color: var(--ayra-secondary, #C9A87C); background: var(--ayra-bg-warm, #F5F0EB); }
+.ayra-no-reviews {
+    text-align: center;
+    padding: 32px;
+    color: var(--ayra-text-muted, #9B9B9B);
+    font-size: 15px;
+}
+
+/* ─── Review Image Upload ─── */
+.ayra-image-upload-area {
+    margin-top: 4px;
+}
+.ayra-image-previews {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.ayra-img-preview-item {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid var(--ayra-border, #E8E4DF);
+}
+.ayra-img-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.ayra-img-preview-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.9);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    padding: 0;
+}
+.ayra-add-images-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    border: 2px dashed var(--ayra-border, #E8E4DF);
+    background: #fff;
+    color: var(--ayra-text-light, #6B6B6B);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+}
+.ayra-add-images-btn:hover {
+    border-color: var(--ayra-secondary, #C9A87C);
+    color: var(--ayra-secondary, #C9A87C);
+    background: var(--ayra-bg-warm, #F5F0EB);
+}
+
+/* ─── Review Images Gallery (Large Messenger Screenshots) ─── */
+.ayra-review-images-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 14px 0;
+}
+.ayra-review-img-thumb {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1.5px solid var(--ayra-border-light, #F0ECE7);
+    cursor: zoom-in;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    background: #f8f6f3;
+}
+.ayra-review-img-thumb:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
+}
+.ayra-review-img-thumb img {
+    width: 100%;
+    height: auto;
+    max-height: 560px;
+    object-fit: contain;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .ayra-review-img-thumb {
+        max-width: 100%;
+    }
+}
+
+/* ─── Image Lightbox Zoom Modal ─── */
+.ayra-lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.ayra-lightbox-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+.ayra-lightbox-content {
+    position: relative;
+    max-width: 92vw;
+    max-height: 92vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ayra-lightbox-img {
+    max-width: 100%;
+    max-height: 88vh;
+    border-radius: 12px;
+    object-fit: contain;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+}
+.ayra-lightbox-close {
+    position: absolute;
+    top: -16px;
+    right: -16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: #fff;
+    border: none;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+/* ─── Size Filter Focus Animation ─── */
+@keyframes ayraPulseFocus {
+    0% { box-shadow: 0 0 0 0 rgba(201, 168, 124, 0.6); transform: scale(1); }
+    50% { box-shadow: 0 0 0 10px rgba(201, 168, 124, 0); transform: scale(1.02); }
+    100% { box-shadow: 0 0 0 0 rgba(201, 168, 124, 0); transform: scale(1); }
+}
+.ayra-pulse-focus {
+    animation: ayraPulseFocus 1.2s ease-in-out 2;
+    border-radius: 14px;
 }

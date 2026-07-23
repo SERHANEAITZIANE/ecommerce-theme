@@ -235,8 +235,39 @@ function ayra_add_delivery_fee($cart) {
     if ($wilaya_code && $delivery_type) {
         $wcode = intval($wilaya_code);
 
+        // ── Special pricing for Ain Defla (wilaya 44) ──
+        // Ain Defla ville (commune) = 200 DA, other communes = 500 DA
+        $commune_name = '';
+        if (!empty($_POST['post_data'])) {
+            parse_str($_POST['post_data'], $pd);
+            $commune_name = isset($pd['billing_commune']) ? sanitize_text_field($pd['billing_commune']) : '';
+        } else {
+            $commune_name = WC()->session->get('ayra_billing_commune', '');
+        }
+        // Strip hub suffix for desk orders (format: "District__hub__N")
+        if (strpos($commune_name, '__hub__') !== false) {
+            $commune_name = explode('__hub__', $commune_name)[0];
+        }
+        // Save commune to session for consistent access
+        if ($commune_name) {
+            WC()->session->set('ayra_billing_commune', $commune_name);
+        }
+
+        if ($wcode === 44 && $delivery_type === 'home') {
+            // Ain Defla ville = 200 DA, other communes = 500 DA
+            // ZR data uses "Ain-Defla" (hyphenated)
+            $commune_lower = mb_strtolower(trim($commune_name));
+            // Normalize: remove hyphens and extra spaces for matching
+            $commune_normalized = str_replace(['-', '  '], [' ', ' '], $commune_lower);
+            $commune_normalized = trim($commune_normalized);
+            if ($commune_normalized === 'ain defla' || $commune_lower === 'ain-defla' || $commune_lower === 'aïn defla' || $commune_lower === 'aïn-defla' || $commune_lower === 'عين الدفلى') {
+                $delivery_fee = 200;
+            } else {
+                $delivery_fee = 500;
+            }
+        }
         // Try ZR JSON pricing first (most accurate)
-        if (function_exists('ayra_zr_get_price')) {
+        elseif (function_exists('ayra_zr_get_price')) {
             $zr_type      = ($delivery_type === 'home') ? 'home' : 'desk';
             $delivery_fee = ayra_zr_get_price($wcode, $zr_type);
         } else {
@@ -247,6 +278,7 @@ function ayra_add_delivery_fee($cart) {
         }
 
         $delivery_label = ($delivery_type === 'home') ? 'توصيل للمنزل' : 'توصيل للمكتب (StopDesk)';
+
 
         // Free delivery promo: order total reached the configured threshold
         if (ayra_is_free_shipping_active()) {
@@ -649,3 +681,30 @@ add_action('woocommerce_variation_set_stock_status', 'ayra_clear_size_caches');
 add_action('created_product_cat', 'ayra_clear_size_caches');
 add_action('edited_product_cat', 'ayra_clear_size_caches');
 add_action('delete_product_cat', 'ayra_clear_size_caches');
+
+// ─── Hide out-of-stock products from shop/catalog ────────
+// If ALL size variations of a product are out of stock, hide it
+function ayra_hide_outofstock_from_catalog($q) {
+    if (is_admin()) return;
+    if (!$q->is_main_query()) return;
+    
+    $post_type = $q->get('post_type');
+    $is_product_query = ($post_type === 'product') || 
+                        (is_array($post_type) && in_array('product', $post_type)) ||
+                        (function_exists('is_shop') && is_shop()) ||
+                        (function_exists('is_product_category') && is_product_category());
+    
+    if (!$is_product_query) return;
+    
+    // Only apply when no size filter is active (size filter already handles this)
+    if (!empty($_GET['filter_size'])) return;
+    
+    $meta_query = $q->get('meta_query') ?: [];
+    $meta_query[] = [
+        'key'     => '_stock_status',
+        'value'   => 'instock',
+        'compare' => '=',
+    ];
+    $q->set('meta_query', $meta_query);
+}
+add_action('pre_get_posts', 'ayra_hide_outofstock_from_catalog', 15);
