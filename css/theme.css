@@ -84,8 +84,8 @@ button {
 
 /* ─── Announcement Banner (mobile overrides — main rules in Feature 6 section) ─── */
 @media (max-width: 768px) {
+    .ayra-has-banner { --ayra-banner-h: 32px; }
     .ayra-announcement-banner {
-        height: 32px;
         font-size: 12px;
     }
 }
@@ -3008,7 +3008,8 @@ body.search-open {
     }
 
     .ayra-filter-bar.filter-open .ayra-filter-collapsible {
-        max-height: 500px;
+        /* Extra headroom so the "pick a size" hint never clips the rows below it */
+        max-height: 700px;
     }
 
     .ayra-filter-collapsible-inner {
@@ -3308,24 +3309,33 @@ body.search-open {
 /* ═══════════════════════════════════════════════════════════
    Feature 6 — Announcement Banner (Scrolling Marquee)
    ═══════════════════════════════════════════════════════════ */
+/* Banner height lives on <body> so the header + main can read it too. */
+.ayra-has-banner { --ayra-banner-h: 34px; }
+
 .ayra-announcement-banner {
-    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--ayra-banner-h, 34px);
+    display: flex;
+    align-items: center;
     overflow: hidden;
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.3px;
     white-space: nowrap;
-    z-index: 999;
-    position: sticky;
-    top: 70px;
+    /* Above the fixed header (1000) but below drawers/overlays (10000). */
+    z-index: 1100;
 }
 .ayra-banner-track {
     display: inline-flex;
+    align-items: center;
     animation: ayra-marquee 30s linear infinite;
+    will-change: transform;
 }
 .ayra-banner-content {
     display: inline-block;
-    padding: 8px 0;
 }
 @keyframes ayra-marquee {
     0%   { transform: translateX(0); }
@@ -3334,6 +3344,15 @@ body.search-open {
 /* Slow down on hover */
 .ayra-announcement-banner:hover .ayra-banner-track {
     animation-play-state: paused;
+}
+
+/* Reserve room for the fixed banner: push the header + page content down.
+   The custom property is inherited from <body>, so both siblings resolve it. */
+.ayra-has-banner .ayra-header {
+    top: var(--ayra-banner-h, 34px);
+}
+.ayra-has-banner .ayra-main {
+    margin-top: calc(70px + var(--ayra-banner-h, 34px));
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -3947,4 +3966,39 @@ body.search-open {
 .ayra-pulse-focus {
     animation: ayraPulseFocus 1.2s ease-in-out 2;
     border-radius: 14px;
+}
+
+/* ─── "Pick your size" hint bubble ─── */
+.ayra-size-hint {
+    display: block;
+    margin-top: 10px;
+    max-height: 0;
+    padding: 0 14px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-4px);
+    background: linear-gradient(135deg, var(--ayra-secondary, #c9a87c), var(--ayra-secondary-dark, #b8946a));
+    color: #fff;
+    border-radius: 12px;
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1.45;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(201, 168, 124, 0.35);
+    transition: max-height 0.35s ease, opacity 0.3s ease, transform 0.3s ease, padding 0.35s ease;
+}
+.ayra-size-hint.show {
+    max-height: 80px;
+    padding: 10px 14px;
+    opacity: 1;
+    transform: translateY(0);
+}
+.ayra-size-hint-arrow {
+    display: inline-block;
+    margin-inline-end: 6px;
+    animation: ayraHintBob 1s ease-in-out infinite;
+}
+@keyframes ayraHintBob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(3px); }
 }

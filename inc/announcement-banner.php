@@ -22,7 +22,9 @@ add_action('admin_menu', 'ayra_banner_add_menu');
 
 // Register settings
 function ayra_banner_register_settings() {
-    register_setting('ayra_banner_options', 'ayra_banner_enabled');
+    register_setting('ayra_banner_options', 'ayra_banner_enabled', [
+        'sanitize_callback' => function ($v) { return $v === 'yes' ? 'yes' : 'no'; },
+    ]);
     register_setting('ayra_banner_options', 'ayra_banner_bg_color');
     register_setting('ayra_banner_options', 'ayra_banner_text_color');
     register_setting('ayra_banner_options', 'ayra_banner_sentences');
@@ -51,6 +53,9 @@ function ayra_banner_settings_page() {
                     <th scope="row">تفعيل البانر</th>
                     <td>
                         <label>
+                            <?php // Hidden field guarantees a value is posted even when the box is unchecked,
+                                  // otherwise WordPress keeps the old option and the banner never turns off. ?>
+                            <input type="hidden" name="ayra_banner_enabled" value="no">
                             <input type="checkbox" name="ayra_banner_enabled" value="yes" <?php checked($enabled, 'yes'); ?>>
                             إظهار البانر في أعلى الموقع
                         </label>
@@ -121,6 +126,17 @@ function ayra_banner_settings_page() {
     </script>
     <?php
 }
+
+// ─── Reserve layout space when the banner is visible ────
+// The banner is a fixed bar above the header; this class lets the CSS
+// push the header + page content down so nothing is hidden underneath it.
+function ayra_banner_body_class($classes) {
+    if (get_option('ayra_banner_enabled', 'yes') === 'yes') {
+        $classes[] = 'ayra-has-banner';
+    }
+    return $classes;
+}
+add_filter('body_class', 'ayra_banner_body_class');
 
 // ─── Render Banner on Frontend ──────────────────────────
 function ayra_render_announcement_banner() {

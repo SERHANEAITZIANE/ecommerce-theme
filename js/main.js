@@ -4,6 +4,44 @@
 (function ($) {
     'use strict';
 
+    // ─── Friendly "pick a size" prompt ──────────────────
+    // Called when the shopper tries to add a product while "All sizes" is
+    // selected. Instead of an error / hard jump, it gently opens the filter,
+    // scrolls to the size row, pulses it and shows a soft hint bubble.
+    function ayraPromptSize(message) {
+        const $bar = $('#ayra-filter-bar');
+        const $filter = $('#ayra-size-filter');
+        if (!$filter.length) return false;
+
+        // Make sure the (mobile) filter panel is expanded so the row is visible
+        if ($bar.length && !$bar.hasClass('filter-open')) {
+            $bar.addClass('filter-open');
+            $('#ayra-filter-toggle').attr('aria-expanded', 'true');
+        }
+
+        // Inject / refresh the hint bubble inside the size section
+        let $hint = $filter.children('.ayra-size-hint');
+        if (!$hint.length) {
+            $hint = $('<div class="ayra-size-hint" role="status" aria-live="polite"></div>');
+            $filter.append($hint);
+        }
+        $hint.html('<span class="ayra-size-hint-arrow">☝️</span>' + (message || 'اختاري مقاسكِ أوّلاً'));
+
+        // Let the panel finish expanding, then scroll + pulse + reveal hint
+        setTimeout(function () {
+            const headerOffset = 120;
+            const top = Math.max(0, $filter.offset().top - headerOffset);
+            window.scrollTo({ top: top, behavior: 'smooth' });
+            $filter.addClass('ayra-pulse-focus');
+            setTimeout(function () { $filter.removeClass('ayra-pulse-focus'); }, 2500);
+            $hint.addClass('show');
+        }, 60);
+
+        clearTimeout(ayraPromptSize._timer);
+        ayraPromptSize._timer = setTimeout(function () { $hint.removeClass('show'); }, 4500);
+        return true;
+    }
+
     // ─── Cart Drawer ────────────────────────────────────
     const CartDrawer = {
         init() {
@@ -119,22 +157,9 @@
                 if ($btn.hasClass('select-options') || !variationId) {
                     e.preventDefault();
                     e.stopPropagation();
-                    const $sizeFilter = $('#ayra-size-filter');
-                    if ($sizeFilter.length) {
-                        const headerOffset = 110;
-                        const elementPosition = $sizeFilter.offset().top;
-                        const offsetPosition = elementPosition - headerOffset;
-                        window.scrollTo({
-                            top: Math.max(0, offsetPosition),
-                            behavior: 'smooth'
-                        });
-                        $sizeFilter.addClass('ayra-pulse-focus');
-                        setTimeout(function () {
-                            $sizeFilter.removeClass('ayra-pulse-focus');
-                        }, 2500);
-                        return;
-                    }
-                    // Fallback to product page if not on shop page
+                    // On the shop page: gently guide the shopper to pick a size
+                    if (ayraPromptSize('اختاري مقاسكِ أوّلاً لإضافة المنتج للسلة')) return;
+                    // Fallback to product page if not on shop page (no size filter present)
                     const href = $btn.attr('href');
                     if (href) window.location.href = href;
                     return;
